@@ -1,4 +1,4 @@
-import type { Pet, PetPhoto } from './pet.types'
+import type { Pet } from './pet.types'
 
 export interface TutorPhoto {
   id: number

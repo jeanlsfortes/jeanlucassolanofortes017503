@@ -50,7 +50,7 @@ const MainLayout = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -152,8 +152,10 @@ const MainLayout = () => {
         )}
       </nav>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <Outlet />
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-2xl shadow-sm min-h-[calc(100vh-7rem)]">
+          <Outlet />
+        </div>
       </main>
     </div>
   )

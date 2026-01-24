@@ -31,12 +31,12 @@ function AppRoutes() {
           <Route element={<MainLayout />}>
             <Route path={ROUTES.HOME} element={<HomePage />} />
             <Route path={ROUTES.PETS.LIST} element={<HomePage />} />
-            <Route path="/pets/:id" element={<PetDetailPage />} />
+            <Route path={ROUTES.PETS.DETAIL(':id')} element={<PetDetailPage />} />
             <Route path={ROUTES.PETS.NEW} element={<PetFormPage />} />
-            <Route path="/pets/:id/edit" element={<PetFormPage />} />
+            <Route path={ROUTES.PETS.EDIT(':id')} element={<PetFormPage />} />
             <Route path={ROUTES.TUTORES.LIST} element={<TutorListPage />} />
             <Route path={ROUTES.TUTORES.NEW} element={<TutorFormPage />} />
-            <Route path="/tutores/:id/edit" element={<TutorFormPage />} />
+            <Route path={ROUTES.TUTORES.EDIT(':id')} element={<TutorFormPage />} />
           </Route>
         </Route>
 
