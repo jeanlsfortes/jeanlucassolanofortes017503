@@ -1,15 +1,18 @@
 import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { petService } from '@/api/services/pet.service'
 import { ROUTES } from '@/@core/configs/routes.config'
 import TutorCard from '@/components/shared/TutorCard/TutorCard'
+import ConfirmModal from '@/components/ui/ConfirmModal/ConfirmModal'
 
 const PetDetailPage = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [isImageModalOpen, setIsImageModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
   const {
     data: pet,
@@ -21,6 +24,18 @@ const PetDetailPage = () => {
     queryFn: () => petService.getById(Number(id)),
     enabled: !!id,
   })
+
+  const deleteMutation = useMutation({
+    mutationFn: () => petService.delete(Number(id)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pets'] })
+      navigate(ROUTES.PETS.LIST)
+    },
+  })
+
+  const handleDelete = () => {
+    deleteMutation.mutate()
+  }
 
   const placeholderImage =
     'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=800&q=80'
@@ -161,6 +176,13 @@ const PetDetailPage = () => {
               >
                 Editar
               </Link>
+              <button
+                type="button"
+                onClick={() => setIsDeleteModalOpen(true)}
+                className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Excluir
+              </button>
             </div>
           </div>
         </div>
@@ -225,6 +247,19 @@ const PetDetailPage = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        title="Excluir Pet"
+        message={`Tem certeza que deseja excluir ${pet.nome}? Esta acao nao pode ser desfeita.`}
+        confirmLabel="Excluir"
+        cancelLabel="Cancelar"
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+        onConfirm={handleDelete}
+        onCancel={() => setIsDeleteModalOpen(false)}
+      />
     </div>
   )
 }

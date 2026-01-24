@@ -11,6 +11,7 @@ import { petService } from '@/api/services/pet.service'
 import { ROUTES } from '@/@core/configs/routes.config'
 import { applyPhoneMask } from '@/utils/masks'
 import Input from '@/components/ui/Input/Input'
+import ConfirmModal from '@/components/ui/ConfirmModal/ConfirmModal'
 import type { Pet } from '@/api/types/pet.types'
 
 const TutorFormPage = () => {
@@ -25,6 +26,7 @@ const TutorFormPage = () => {
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
   const [phoneDisplay, setPhoneDisplay] = useState('')
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
   // Pet linking states
   const [showPetSelector, setShowPetSelector] = useState(false)
@@ -135,6 +137,23 @@ const TutorFormPage = () => {
       setApiError(error.response?.data?.message || 'Erro ao desvincular pet')
     },
   })
+
+  // Delete tutor mutation
+  const deleteMutation = useMutation({
+    mutationFn: () => tutorService.delete(Number(id)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tutors'] })
+      navigate(ROUTES.TUTORES.LIST)
+    },
+    onError: (error: AxiosError<{ message?: string }>) => {
+      setApiError(error.response?.data?.message || 'Erro ao excluir tutor')
+      setIsDeleteModalOpen(false)
+    },
+  })
+
+  const handleDeleteTutor = () => {
+    deleteMutation.mutate()
+  }
 
   const uploadPhoto = async (tutorId: number) => {
     if (!photoFile) return
@@ -371,6 +390,15 @@ const TutorFormPage = () => {
               >
                 {isSubmitting ? 'Salvando...' : isEditMode ? 'Salvar Alteracoes' : 'Cadastrar Tutor'}
               </button>
+              {isEditMode && (
+                <button
+                  type="button"
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  className="px-6 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Excluir Tutor
+                </button>
+              )}
             </div>
           </form>
         </div>
@@ -477,6 +505,19 @@ const TutorFormPage = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        title="Excluir Tutor"
+        message={`Tem certeza que deseja excluir ${tutorData?.nome || 'este tutor'}? Esta acao nao pode ser desfeita.`}
+        confirmLabel="Excluir"
+        cancelLabel="Cancelar"
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+        onConfirm={handleDeleteTutor}
+        onCancel={() => setIsDeleteModalOpen(false)}
+      />
     </div>
   )
 }

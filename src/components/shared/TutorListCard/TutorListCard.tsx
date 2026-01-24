@@ -5,9 +5,10 @@ import { ROUTES } from '@/@core/configs/routes.config'
 interface TutorListCardProps {
   tutor: Tutor
   onLinkPet?: (tutor: Tutor) => void
+  onDelete?: (tutor: Tutor) => void
 }
 
-const TutorListCard = ({ tutor, onLinkPet }: TutorListCardProps) => {
+const TutorListCard = ({ tutor, onLinkPet, onDelete }: TutorListCardProps) => {
   const placeholderImage =
     'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80'
 
@@ -136,6 +137,15 @@ const TutorListCard = ({ tutor, onLinkPet }: TutorListCardProps) => {
         >
           Editar
         </Link>
+        {onDelete && (
+          <button
+            type="button"
+            onClick={() => onDelete(tutor)}
+            className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+          >
+            Excluir
+          </button>
+        )}
       </div>
     </div>
   )

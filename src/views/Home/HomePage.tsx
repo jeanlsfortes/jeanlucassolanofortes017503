@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 
 import { petService } from '@/api/services/pet.service'
@@ -7,13 +7,17 @@ import { ROUTES } from '@/@core/configs/routes.config'
 import PetCard from '@/components/shared/PetCard/PetCard'
 import SearchInput from '@/components/ui/SearchInput/SearchInput'
 import Pagination from '@/components/ui/Pagination/Pagination'
+import ConfirmModal from '@/components/ui/ConfirmModal/ConfirmModal'
+import type { Pet } from '@/api/types/pet.types'
 
 const PAGE_SIZE = 10
 
 const HomePage = () => {
+  const queryClient = useQueryClient()
   const [page, setPage] = useState(0)
   const [nomeFilter, setNomeFilter] = useState('')
   const [racaFilter, setRacaFilter] = useState('')
+  const [petToDelete, setPetToDelete] = useState<Pet | null>(null)
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['pets', page, nomeFilter, racaFilter],
@@ -26,6 +30,24 @@ const HomePage = () => {
       }),
     staleTime: 1000 * 60, // 1 minute
   })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => petService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pets'] })
+      setPetToDelete(null)
+    },
+  })
+
+  const handleDeleteClick = useCallback((pet: Pet) => {
+    setPetToDelete(pet)
+  }, [])
+
+  const handleConfirmDelete = useCallback(() => {
+    if (petToDelete) {
+      deleteMutation.mutate(petToDelete.id)
+    }
+  }, [petToDelete, deleteMutation])
 
   const handleNomeChange = useCallback((value: string) => {
     setNomeFilter(value)
@@ -50,7 +72,6 @@ const HomePage = () => {
       <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-6 sm:p-8 mb-8 text-white relative overflow-hidden">
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-10">
-          <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             <defs>
               <pattern id="paw-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
                 <circle cx="5" cy="5" r="2" fill="currentColor" />
@@ -59,7 +80,6 @@ const HomePage = () => {
               </pattern>
             </defs>
             <rect width="100" height="100" fill="url(#paw-pattern)" />
-          </svg>
         </div>
 
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -212,7 +232,7 @@ const HomePage = () => {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {data.content.map((pet) => (
-              <PetCard key={pet.id} pet={pet} />
+              <PetCard key={pet.id} pet={pet} onDelete={handleDeleteClick} />
             ))}
           </div>
 
@@ -231,6 +251,19 @@ const HomePage = () => {
           </div>
         </>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!petToDelete}
+        title="Excluir Pet"
+        message={`Tem certeza que deseja excluir ${petToDelete?.nome || 'este pet'}? Esta acao nao pode ser desfeita.`}
+        confirmLabel="Excluir"
+        cancelLabel="Cancelar"
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPetToDelete(null)}
+      />
     </div>
   )
 }
