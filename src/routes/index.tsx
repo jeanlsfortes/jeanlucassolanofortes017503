@@ -11,6 +11,7 @@ import { ROUTES } from '@/@core/configs/routes.config'
 const HomePage = lazy(() => import('@/views/Home/HomePage'))
 const PetDetailPage = lazy(() => import('@/views/PetDetail/PetDetailPage'))
 const PetFormPage = lazy(() => import('@/views/PetForm/PetFormPage'))
+const TutorListPage = lazy(() => import('@/views/TutorList/TutorListPage'))
 const TutorFormPage = lazy(() => import('@/views/TutorForm/TutorFormPage'))
 const LoginPage = lazy(() => import('@/views/Login/LoginPage'))
 
@@ -33,6 +34,7 @@ function AppRoutes() {
             <Route path="/pets/:id" element={<PetDetailPage />} />
             <Route path={ROUTES.PETS.NEW} element={<PetFormPage />} />
             <Route path="/pets/:id/edit" element={<PetFormPage />} />
+            <Route path={ROUTES.TUTORES.LIST} element={<TutorListPage />} />
             <Route path={ROUTES.TUTORES.NEW} element={<TutorFormPage />} />
             <Route path="/tutores/:id/edit" element={<TutorFormPage />} />
           </Route>

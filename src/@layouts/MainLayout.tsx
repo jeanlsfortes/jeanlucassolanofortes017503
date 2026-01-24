@@ -31,10 +31,10 @@ const MainLayout = () => {
                   Pets
                 </Link>
                 <Link
-                  to={ROUTES.TUTORES.NEW}
+                  to={ROUTES.TUTORES.LIST}
                   className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-primary-600"
                 >
-                  Novo Tutor
+                  Tutores
                 </Link>
               </div>
             </div>

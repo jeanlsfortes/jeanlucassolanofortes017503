@@ -8,6 +8,8 @@ export const ROUTES = {
     EDIT: (id: string) => `/pets/${id}/edit`,
   },
   TUTORES: {
+    LIST: '/tutores',
+    DETAIL: (id: string) => `/tutores/${id}`,
     NEW: '/tutores/new',
     EDIT: (id: string) => `/tutores/${id}/edit`,
   },
