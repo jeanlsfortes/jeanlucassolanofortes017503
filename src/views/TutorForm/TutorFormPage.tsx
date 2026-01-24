@@ -86,7 +86,7 @@ const TutorFormPage = () => {
         await uploadPhoto(newTutor.id)
       }
       queryClient.invalidateQueries({ queryKey: ['tutors'] })
-      navigate(ROUTES.HOME, { replace: true })
+      navigate(-1)
     },
     onError: (error: AxiosError<{ message?: string }>) => {
       setApiError(error.response?.data?.message || 'Erro ao criar tutor')
@@ -103,7 +103,7 @@ const TutorFormPage = () => {
       }
       queryClient.invalidateQueries({ queryKey: ['tutors'] })
       queryClient.invalidateQueries({ queryKey: ['tutor', id] })
-      navigate(ROUTES.HOME, { replace: true })
+      navigate(-1)
     },
     onError: (error: AxiosError<{ message?: string }>) => {
       setApiError(error.response?.data?.message || 'Erro ao atualizar tutor')
