@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 import { petService } from '@/api/services/pet.service'
 import { ROUTES } from '@/@core/configs/routes.config'
@@ -13,6 +14,7 @@ import type { Pet } from '@/api/types/pet.types'
 const PAGE_SIZE = 10
 
 const HomePage = () => {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [page, setPage] = useState(0)
   const [nomeFilter, setNomeFilter] = useState('')
@@ -86,17 +88,17 @@ const HomePage = () => {
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-3">
               <span className="text-3xl">🐾</span>
-              Lista de Pets
+              {t('pets.title')}
             </h1>
             <p className="text-gray-300 mt-2 text-sm sm:text-base">
-              Gerencie todos os pets cadastrados no sistema
+              {t('pets.subtitle')}
             </p>
             {data && (
               <div className="flex items-center gap-4 mt-4">
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2">
                   <span className="text-2xl font-bold">{data.total}</span>
                   <span className="text-gray-300 text-sm ml-2">
-                    {data.total === 1 ? 'pet' : 'pets'}
+                    {data.total === 1 ? t('pets.pet') : t('pets.pets')}
                   </span>
                 </div>
               </div>
@@ -110,7 +112,7 @@ const HomePage = () => {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            <span>Novo Pet</span>
+            <span>{t('pets.newPet')}</span>
           </Link>
         </div>
       </div>
@@ -122,20 +124,20 @@ const HomePage = () => {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
-            <span className="hidden sm:inline">Filtros:</span>
+            <span className="hidden sm:inline">{t('common.filters')}</span>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 flex-1">
             <SearchInput
               value={nomeFilter}
               onChange={handleNomeChange}
-              placeholder="Buscar por nome..."
+              placeholder={t('common.searchByName')}
               className="w-full sm:w-56"
             />
             <SearchInput
               value={racaFilter}
               onChange={handleRacaChange}
-              placeholder="Filtrar por raca..."
+              placeholder={t('pets.filterByBreed')}
               className="w-full sm:w-56"
             />
           </div>
@@ -153,7 +155,7 @@ const HomePage = () => {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
-              Limpar
+              {t('common.clear')}
             </button>
           )}
         </div>
@@ -168,7 +170,7 @@ const HomePage = () => {
               <span className="text-2xl">🐾</span>
             </div>
           </div>
-          <p className="mt-4 text-gray-500 text-sm">Carregando pets...</p>
+          <p className="mt-4 text-gray-500 text-sm">{t('pets.loadingPets')}</p>
         </div>
       )}
 
@@ -180,15 +182,15 @@ const HomePage = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-red-800 mb-2">Erro ao carregar</h3>
+          <h3 className="text-lg font-medium text-red-800 mb-2">{t('pets.loadError')}</h3>
           <p className="text-red-600 text-sm mb-4">
-            {error instanceof Error ? error.message : 'Erro desconhecido'}
+            {error instanceof Error ? error.message : t('common.unknownError')}
           </p>
           <button
             onClick={() => window.location.reload()}
             className="px-5 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
           >
-            Tentar novamente
+            {t('common.tryAgain')}
           </button>
         </div>
       )}
@@ -198,12 +200,12 @@ const HomePage = () => {
         <div className="bg-gray-50 border border-gray-200 rounded-2xl p-12 text-center">
           <div className="text-6xl mb-4">🐾</div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {hasActiveFilters ? 'Nenhum pet encontrado' : 'Nenhum pet cadastrado'}
+            {hasActiveFilters ? t('pets.noPetsFound') : t('pets.noPetsRegistered')}
           </h3>
           <p className="text-gray-500 mb-6">
             {hasActiveFilters
-              ? 'Nao encontramos pets com os filtros aplicados'
-              : 'Comece cadastrando seu primeiro pet!'}
+              ? t('pets.noFilterResults')
+              : t('pets.startRegistering')}
           </p>
           {hasActiveFilters ? (
             <button
@@ -214,14 +216,14 @@ const HomePage = () => {
               }}
               className="inline-flex px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors"
             >
-              Limpar filtros
+              {t('common.clearFilters')}
             </button>
           ) : (
             <Link
               to={ROUTES.PETS.NEW}
               className="inline-flex px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
             >
-              Cadastrar Pet
+              {t('pets.registerPet')}
             </Link>
           )}
         </div>
@@ -245,8 +247,7 @@ const HomePage = () => {
             />
 
             <p className="text-sm text-gray-500 bg-gray-100 px-4 py-2 rounded-full">
-              Mostrando <span className="font-medium text-gray-700">{data.content.length}</span> de{' '}
-              <span className="font-medium text-gray-700">{data.total}</span> pets
+              {t('common.showing', { current: data.content.length, total: data.total })} {t('pets.pets')}
             </p>
           </div>
         </>
@@ -255,10 +256,10 @@ const HomePage = () => {
       {/* Delete Confirmation Modal */}
       <ConfirmModal
         isOpen={!!petToDelete}
-        title="Excluir Pet"
-        message={`Tem certeza que deseja excluir ${petToDelete?.nome || 'este pet'}? Esta acao nao pode ser desfeita.`}
-        confirmLabel="Excluir"
-        cancelLabel="Cancelar"
+        title={t('pets.deleteConfirmTitle')}
+        message={t('pets.deleteConfirmMessage', { name: petToDelete?.nome || 'este pet' })}
+        confirmLabel={t('common.delete')}
+        cancelLabel={t('common.cancel')}
         variant="danger"
         isLoading={deleteMutation.isPending}
         onConfirm={handleConfirmDelete}
@@ -269,4 +270,3 @@ const HomePage = () => {
 }
 
 export default HomePage
-

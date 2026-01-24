@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 
 import { petService } from '@/api/services/pet.service'
 import { ROUTES } from '@/@core/configs/routes.config'
@@ -8,6 +9,7 @@ import TutorCard from '@/components/shared/TutorCard/TutorCard'
 import ConfirmModal from '@/components/ui/ConfirmModal/ConfirmModal'
 
 const PetDetailPage = () => {
+  const { t } = useTranslation()
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -55,14 +57,14 @@ const PetDetailPage = () => {
       <div className="px-4 py-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
           <p className="text-red-700">
-            Erro ao carregar pet:{' '}
-            {error instanceof Error ? error.message : 'Erro desconhecido'}
+            {t('pets.petLoadError')}{' '}
+            {error instanceof Error ? error.message : t('common.unknownError')}
           </p>
           <button
             onClick={() => navigate(ROUTES.PETS.LIST)}
             className="mt-4 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
           >
-            Voltar para lista
+            {t('pets.backToList')}
           </button>
         </div>
       </div>
@@ -73,12 +75,12 @@ const PetDetailPage = () => {
     return (
       <div className="px-4 py-6">
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-          <p className="text-gray-700">Pet nao encontrado</p>
+          <p className="text-gray-700">{t('pets.petNotFound')}</p>
           <button
             onClick={() => navigate(ROUTES.PETS.LIST)}
             className="mt-4 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
           >
-            Voltar para lista
+            {t('pets.backToList')}
           </button>
         </div>
       </div>
@@ -105,7 +107,7 @@ const PetDetailPage = () => {
             d="M10 19l-7-7m0 0l7-7m-7 7h18"
           />
         </svg>
-        <span>Voltar</span>
+        <span>{t('common.back')}</span>
       </button>
 
       {/* Pet Info Section */}
@@ -153,16 +155,16 @@ const PetDetailPage = () => {
             <div className="space-y-3">
               {pet.raca && (
                 <div className="flex items-center gap-3">
-                  <span className="text-gray-500 font-medium w-20">Raca:</span>
+                  <span className="text-gray-500 font-medium w-20">{t('pets.breedLabel')}</span>
                   <span className="text-gray-900">{pet.raca}</span>
                 </div>
               )}
 
               {pet.idade !== undefined && pet.idade !== null && (
                 <div className="flex items-center gap-3">
-                  <span className="text-gray-500 font-medium w-20">Idade:</span>
+                  <span className="text-gray-500 font-medium w-20">{t('pets.ageLabel')}</span>
                   <span className="text-gray-900">
-                    {pet.idade} {pet.idade === 1 ? 'ano' : 'anos'}
+                    {pet.idade} {pet.idade === 1 ? t('common.year') : t('common.years')}
                   </span>
                 </div>
               )}
@@ -174,14 +176,14 @@ const PetDetailPage = () => {
                 to={ROUTES.PETS.EDIT(String(pet.id))}
                 className="px-4 py-2 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
               >
-                Editar
+                {t('common.edit')}
               </Link>
               <button
                 type="button"
                 onClick={() => setIsDeleteModalOpen(true)}
                 className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
               >
-                Excluir
+                {t('common.delete')}
               </button>
             </div>
           </div>
@@ -192,7 +194,7 @@ const PetDetailPage = () => {
       {pet.tutores && pet.tutores.length > 0 && (
         <div className="mt-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">
-            Tutores ({pet.tutores.length})
+            {t('pets.tutorsCount', { count: pet.tutores.length })}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -206,9 +208,9 @@ const PetDetailPage = () => {
       {/* No Tutors Message */}
       {(!pet.tutores || pet.tutores.length === 0) && (
         <div className="mt-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Tutores</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">{t('pets.tutors')}</h2>
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-            <p className="text-gray-500">Este pet nao possui tutores vinculados.</p>
+            <p className="text-gray-500">{t('pets.noTutorsLinked')}</p>
           </div>
         </div>
       )}
@@ -251,10 +253,10 @@ const PetDetailPage = () => {
       {/* Delete Confirmation Modal */}
       <ConfirmModal
         isOpen={isDeleteModalOpen}
-        title="Excluir Pet"
-        message={`Tem certeza que deseja excluir ${pet.nome}? Esta acao nao pode ser desfeita.`}
-        confirmLabel="Excluir"
-        cancelLabel="Cancelar"
+        title={t('pets.deleteConfirmTitle')}
+        message={t('pets.deleteConfirmMessage', { name: pet.nome })}
+        confirmLabel={t('common.delete')}
+        cancelLabel={t('common.cancel')}
         variant="danger"
         isLoading={deleteMutation.isPending}
         onConfirm={handleDelete}
@@ -265,4 +267,3 @@ const PetDetailPage = () => {
 }
 
 export default PetDetailPage
-

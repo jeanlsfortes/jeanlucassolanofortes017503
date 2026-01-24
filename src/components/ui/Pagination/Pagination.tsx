@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface PaginationProps {
   currentPage: number
@@ -13,6 +14,8 @@ const Pagination = ({
   onPageChange,
   maxVisible = 5,
 }: PaginationProps) => {
+  const { t } = useTranslation()
+
   // Calculate which pages to show
   const pages = useMemo(() => {
     if (totalPages <= maxVisible) {
@@ -73,7 +76,7 @@ const Pagination = ({
         disabled={currentPage === 1}
         className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
       >
-        <span className="hidden sm:inline">Anterior</span>
+        <span className="hidden sm:inline">{t('common.previous')}</span>
         <span className="sm:hidden">&lt;</span>
       </button>
 
@@ -111,7 +114,7 @@ const Pagination = ({
         disabled={currentPage === totalPages}
         className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
       >
-        <span className="hidden sm:inline">Proxima</span>
+        <span className="hidden sm:inline">{t('common.next')}</span>
         <span className="sm:hidden">&gt;</span>
       </button>
     </div>
@@ -119,4 +122,3 @@ const Pagination = ({
 }
 
 export default Pagination
-

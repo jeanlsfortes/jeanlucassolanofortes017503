@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth.store'
 import { ROUTES } from '@/@core/configs/routes.config'
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher/LanguageSwitcher'
 
 const MainLayout = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const logout = useAuthStore((state) => state.logout)
@@ -21,7 +24,7 @@ const MainLayout = () => {
   const navLinks = [
     {
       to: ROUTES.PETS.LIST,
-      label: 'Pets',
+      label: t('nav.pets'),
       match: '/pets',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -36,7 +39,7 @@ const MainLayout = () => {
     },
     {
       to: ROUTES.TUTORES.LIST,
-      label: 'Tutores',
+      label: t('nav.tutors'),
       match: '/tutores',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,7 +59,7 @@ const MainLayout = () => {
                 to={ROUTES.HOME}
                 className="flex items-center px-2 py-2 text-xl font-bold text-primary-600"
               >
-                Pet Manager
+                {t('nav.brand')}
               </Link>
               {/* Desktop Navigation */}
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -77,13 +80,16 @@ const MainLayout = () => {
               </div>
             </div>
 
-            <div className="flex items-center">
+            <div className="flex items-center gap-3">
+              {/* Language Switcher */}
+              <LanguageSwitcher />
+
               {/* Desktop Logout */}
               <button
                 onClick={handleLogout}
                 className="hidden sm:block px-4 py-2 text-sm font-medium text-gray-700 hover:text-primary-600"
               >
-                Sair
+                {t('nav.logout')}
               </button>
 
               {/* Mobile Menu Button */}
@@ -93,7 +99,7 @@ const MainLayout = () => {
                 className="sm:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary-600 hover:bg-gray-100 focus:outline-none"
                 aria-expanded={isMobileMenuOpen}
               >
-                <span className="sr-only">Abrir menu</span>
+                <span className="sr-only">{t('nav.openMenu')}</span>
                 {isMobileMenuOpen ? (
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -139,7 +145,7 @@ const MainLayout = () => {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                Sair
+                {t('nav.logout')}
               </button>
             </div>
           </div>
@@ -154,4 +160,3 @@ const MainLayout = () => {
 }
 
 export default MainLayout
-

@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
+import { useTranslation } from 'react-i18next'
 
 import { tutorSchema, type TutorFormData } from '@/utils/validators'
 import { tutorService } from '@/api/services/tutor.service'
@@ -15,6 +16,7 @@ import ConfirmModal from '@/components/ui/ConfirmModal/ConfirmModal'
 import type { Pet } from '@/api/types/pet.types'
 
 const TutorFormPage = () => {
+  const { t } = useTranslation()
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -91,7 +93,7 @@ const TutorFormPage = () => {
       navigate(-1)
     },
     onError: (error: AxiosError<{ message?: string }>) => {
-      setApiError(error.response?.data?.message || 'Erro ao criar tutor')
+      setApiError(error.response?.data?.message || t('tutors.createError'))
     },
   })
 
@@ -108,7 +110,7 @@ const TutorFormPage = () => {
       navigate(-1)
     },
     onError: (error: AxiosError<{ message?: string }>) => {
-      setApiError(error.response?.data?.message || 'Erro ao atualizar tutor')
+      setApiError(error.response?.data?.message || t('tutors.updateError'))
     },
   })
 
@@ -122,7 +124,7 @@ const TutorFormPage = () => {
       setPetSearchTerm('')
     },
     onError: (error: AxiosError<{ message?: string }>) => {
-      setApiError(error.response?.data?.message || 'Erro ao vincular pet')
+      setApiError(error.response?.data?.message || t('tutors.linkError'))
     },
   })
 
@@ -134,7 +136,7 @@ const TutorFormPage = () => {
       queryClient.invalidateQueries({ queryKey: ['tutor', id] })
     },
     onError: (error: AxiosError<{ message?: string }>) => {
-      setApiError(error.response?.data?.message || 'Erro ao desvincular pet')
+      setApiError(error.response?.data?.message || t('tutors.unlinkError'))
     },
   })
 
@@ -146,7 +148,7 @@ const TutorFormPage = () => {
       navigate(ROUTES.TUTORES.LIST)
     },
     onError: (error: AxiosError<{ message?: string }>) => {
-      setApiError(error.response?.data?.message || 'Erro ao excluir tutor')
+      setApiError(error.response?.data?.message || t('tutors.deleteError'))
       setIsDeleteModalOpen(false)
     },
   })
@@ -196,11 +198,11 @@ const TutorFormPage = () => {
     const file = e.target.files?.[0]
     if (file) {
       if (!file.type.startsWith('image/')) {
-        setApiError('Por favor, selecione uma imagem valida')
+        setApiError(t('pets.invalidImage'))
         return
       }
       if (file.size > 5 * 1024 * 1024) {
-        setApiError('A imagem deve ter no maximo 5MB')
+        setApiError(t('pets.imageTooLarge'))
         return
       }
       setPhotoFile(file)
@@ -224,7 +226,7 @@ const TutorFormPage = () => {
   }
 
   const handleUnlinkPet = (petId: number) => {
-    if (id && confirm('Deseja remover o vinculo com este pet?')) {
+    if (id && confirm(t('tutors.removeLinkConfirm'))) {
       unlinkPetMutation.mutate({ tutorId: Number(id), petId })
     }
   }
@@ -256,12 +258,12 @@ const TutorFormPage = () => {
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
-        <span>Voltar</span>
+        <span>{t('common.back')}</span>
       </button>
 
       {/* Title */}
       <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">
-        {isEditMode ? 'Editar Tutor' : 'Novo Tutor'}
+        {isEditMode ? t('tutors.editTutor') : t('tutors.newTutor')}
       </h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -277,7 +279,7 @@ const TutorFormPage = () => {
             {/* Photo Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Foto do Tutor
+                {t('tutors.tutorPhoto')}
               </label>
               <div className="flex items-start gap-4">
                 <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
@@ -316,27 +318,27 @@ const TutorFormPage = () => {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
-                    Selecionar foto
+                    {t('pets.selectPhoto')}
                   </label>
-                  <p className="mt-2 text-xs text-gray-500">PNG, JPG ou GIF. Maximo 5MB.</p>
+                  <p className="mt-2 text-xs text-gray-500">{t('pets.photoRequirements')}</p>
                 </div>
               </div>
             </div>
 
             {/* Nome */}
             <Input
-              label="Nome Completo *"
+              label={t('tutors.fullName')}
               type="text"
-              placeholder="Nome do tutor"
+              placeholder={t('tutors.namePlaceholder')}
               error={errors.nome?.message}
               {...register('nome')}
             />
 
             {/* Email */}
             <Input
-              label="Email"
+              label={t('tutors.email')}
               type="email"
-              placeholder="email@exemplo.com (opcional)"
+              placeholder={t('tutors.emailPlaceholder')}
               error={errors.email?.message}
               {...register('email')}
             />
@@ -344,13 +346,13 @@ const TutorFormPage = () => {
             {/* Telefone */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Telefone
+                {t('tutors.phone')}
               </label>
               <input
                 type="tel"
                 value={phoneDisplay}
                 onChange={handlePhoneChange}
-                placeholder="(00) 00000-0000"
+                placeholder={t('tutors.phonePlaceholder')}
                 className="w-full px-3 py-2 bg-white text-gray-900 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
               />
               {errors.telefone?.message && (
@@ -361,10 +363,10 @@ const TutorFormPage = () => {
             {/* Endereco */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Endereco
+                {t('tutors.address')}
               </label>
               <textarea
-                placeholder="Endereco completo (opcional)"
+                placeholder={t('tutors.addressPlaceholder')}
                 rows={3}
                 className="w-full px-3 py-2 bg-white text-gray-900 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                 {...register('endereco')}
@@ -381,14 +383,14 @@ const TutorFormPage = () => {
                 onClick={() => navigate(-1)}
                 className="px-6 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Cancelar
+                {t('common.cancel')}
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="px-6 py-2.5 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Salvando...' : isEditMode ? 'Salvar Alteracoes' : 'Cadastrar Tutor'}
+                {isSubmitting ? t('common.saving') : isEditMode ? t('tutors.saveChanges') : t('tutors.registerTutor')}
               </button>
               {isEditMode && (
                 <button
@@ -396,7 +398,7 @@ const TutorFormPage = () => {
                   onClick={() => setIsDeleteModalOpen(true)}
                   className="px-6 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
                 >
-                  Excluir Tutor
+                  {t('tutors.deleteTutor')}
                 </button>
               )}
             </div>
@@ -408,13 +410,13 @@ const TutorFormPage = () => {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg border border-gray-200 p-4">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">Pets Vinculados</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{t('tutors.linkedPets')}</h2>
                 <button
                   type="button"
                   onClick={() => setShowPetSelector(!showPetSelector)}
                   className="px-3 py-1.5 text-sm bg-gray-900 text-white rounded-lg hover:bg-gray-800"
                 >
-                  + Vincular
+                  {t('tutors.linkPet')}
                 </button>
               </div>
 
@@ -425,13 +427,13 @@ const TutorFormPage = () => {
                     type="text"
                     value={petSearchTerm}
                     onChange={(e) => setPetSearchTerm(e.target.value)}
-                    placeholder="Buscar pet por nome..."
+                    placeholder={t('tutors.searchPetByName')}
                     className="w-full px-3 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-md mb-2"
                   />
                   <div className="max-h-40 overflow-y-auto space-y-1">
                     {filteredAvailablePets.length === 0 ? (
                       <p className="text-sm text-gray-500 text-center py-2">
-                        Nenhum pet disponivel
+                        {t('tutors.noPetsAvailableShort')}
                       </p>
                     ) : (
                       filteredAvailablePets.map((pet) => (
@@ -487,7 +489,7 @@ const TutorFormPage = () => {
                         onClick={() => handleUnlinkPet(pet.id)}
                         disabled={unlinkPetMutation.isPending}
                         className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
-                        title="Remover vinculo"
+                        title={t('tutors.removeLink')}
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -497,7 +499,7 @@ const TutorFormPage = () => {
                   ))
                 ) : (
                   <p className="text-sm text-gray-500 text-center py-4">
-                    Nenhum pet vinculado
+                    {t('tutors.noPetsLinked')}
                   </p>
                 )}
               </div>
@@ -509,10 +511,10 @@ const TutorFormPage = () => {
       {/* Delete Confirmation Modal */}
       <ConfirmModal
         isOpen={isDeleteModalOpen}
-        title="Excluir Tutor"
-        message={`Tem certeza que deseja excluir ${tutorData?.nome || 'este tutor'}? Esta acao nao pode ser desfeita.`}
-        confirmLabel="Excluir"
-        cancelLabel="Cancelar"
+        title={t('tutors.deleteConfirmTitle')}
+        message={t('tutors.deleteConfirmMessage', { name: tutorData?.nome || 'este tutor' })}
+        confirmLabel={t('common.delete')}
+        cancelLabel={t('common.cancel')}
         variant="danger"
         isLoading={deleteMutation.isPending}
         onConfirm={handleDeleteTutor}
@@ -523,4 +525,3 @@ const TutorFormPage = () => {
 }
 
 export default TutorFormPage
-

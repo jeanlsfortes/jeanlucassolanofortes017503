@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 interface ConfirmModalProps {
   isOpen: boolean
   title: string
@@ -14,14 +16,19 @@ const ConfirmModal = ({
   isOpen,
   title,
   message,
-  confirmLabel = 'Confirmar',
-  cancelLabel = 'Cancelar',
+  confirmLabel,
+  cancelLabel,
   variant = 'danger',
   isLoading = false,
   onConfirm,
   onCancel,
 }: ConfirmModalProps) => {
+  const { t } = useTranslation()
+
   if (!isOpen) return null
+
+  const defaultConfirmLabel = confirmLabel || t('common.confirm')
+  const defaultCancelLabel = cancelLabel || t('common.cancel')
 
   const variantStyles = {
     danger: {
@@ -103,7 +110,7 @@ const ConfirmModal = ({
             disabled={isLoading}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {cancelLabel}
+            {defaultCancelLabel}
           </button>
           <button
             type="button"
@@ -132,10 +139,10 @@ const ConfirmModal = ({
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                Excluindo...
+                {t('common.deleting')}
               </span>
             ) : (
-              confirmLabel
+              defaultConfirmLabel
             )}
           </button>
         </div>

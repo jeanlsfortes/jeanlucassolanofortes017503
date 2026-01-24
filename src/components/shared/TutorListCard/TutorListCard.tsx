@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { Tutor } from '@/api/types/tutor.types'
 import { ROUTES } from '@/@core/configs/routes.config'
 
@@ -9,6 +10,7 @@ interface TutorListCardProps {
 }
 
 const TutorListCard = ({ tutor, onLinkPet, onDelete }: TutorListCardProps) => {
+  const { t } = useTranslation()
   const placeholderImage =
     'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80'
 
@@ -86,7 +88,7 @@ const TutorListCard = ({ tutor, onLinkPet, onDelete }: TutorListCardProps) => {
       <div className="px-4 pb-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-700">
-            Pets ({tutor.pets?.length || 0})
+            {t('tutors.petsCount', { count: tutor.pets?.length || 0 })}
           </span>
           {onLinkPet && (
             <button
@@ -94,7 +96,7 @@ const TutorListCard = ({ tutor, onLinkPet, onDelete }: TutorListCardProps) => {
               onClick={() => onLinkPet(tutor)}
               className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors"
             >
-              + Vincular Pet
+              {t('tutors.linkPetButton')}
             </button>
           )}
         </div>
@@ -120,12 +122,12 @@ const TutorListCard = ({ tutor, onLinkPet, onDelete }: TutorListCardProps) => {
             ))}
             {tutor.pets.length > 4 && (
               <span className="text-xs text-gray-500 self-center">
-                +{tutor.pets.length - 4} mais
+                {t('common.more', { count: tutor.pets.length - 4 })}
               </span>
             )}
           </div>
         ) : (
-          <p className="text-xs text-gray-400">Nenhum pet vinculado</p>
+          <p className="text-xs text-gray-400">{t('tutors.noPetsLinked')}</p>
         )}
       </div>
 
@@ -135,7 +137,7 @@ const TutorListCard = ({ tutor, onLinkPet, onDelete }: TutorListCardProps) => {
           to={ROUTES.TUTORES.EDIT(String(tutor.id))}
           className="flex-1 text-center py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
         >
-          Editar
+          {t('common.edit')}
         </Link>
         {onDelete && (
           <button
@@ -143,7 +145,7 @@ const TutorListCard = ({ tutor, onLinkPet, onDelete }: TutorListCardProps) => {
             onClick={() => onDelete(tutor)}
             className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
           >
-            Excluir
+            {t('common.delete')}
           </button>
         )}
       </div>

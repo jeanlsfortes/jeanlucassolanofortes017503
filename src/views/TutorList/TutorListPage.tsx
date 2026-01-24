@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { AxiosError } from 'axios'
+import { useTranslation } from 'react-i18next'
 
 import { tutorService } from '@/api/services/tutor.service'
 import { petService } from '@/api/services/pet.service'
@@ -17,6 +18,7 @@ import type { Pet } from '@/api/types/pet.types'
 const PAGE_SIZE = 10
 
 const TutorListPage = () => {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [page, setPage] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
@@ -57,7 +59,7 @@ const TutorListPage = () => {
       setLinkError(null)
     },
     onError: (error: AxiosError<{ message?: string }>) => {
-      setLinkError(error.response?.data?.message || 'Erro ao vincular pet')
+      setLinkError(error.response?.data?.message || t('tutors.linkError'))
     },
   })
 
@@ -122,13 +124,13 @@ const TutorListPage = () => {
     <div className="px-4 py-6">
       {/* Header */}
       <PageHeader
-        title="Lista de Tutores"
-        subtitle="Gerencie todos os tutores cadastrados no sistema"
+        title={t('tutors.title')}
+        subtitle={t('tutors.subtitle')}
         icon="👥"
         count={data?.total}
-        countLabel={data?.total === 1 ? 'tutor' : 'tutores'}
+        countLabel={data?.total === 1 ? t('tutors.tutor') : t('tutors.tutors')}
         actionLink={ROUTES.TUTORES.NEW}
-        actionLabel="Novo Tutor"
+        actionLabel={t('tutors.newTutor')}
         actionIcon={
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -144,13 +146,13 @@ const TutorListPage = () => {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <span className="hidden sm:inline">Buscar:</span>
+            <span className="hidden sm:inline">{t('common.search')}</span>
           </div>
 
           <SearchInput
             value={searchTerm}
             onChange={handleSearchChange}
-            placeholder="Buscar por nome..."
+            placeholder={t('common.searchByName')}
             className="w-full sm:w-64"
           />
 
@@ -166,7 +168,7 @@ const TutorListPage = () => {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
-              Limpar
+              {t('common.clear')}
             </button>
           )}
         </div>
@@ -181,7 +183,7 @@ const TutorListPage = () => {
               <span className="text-2xl">👥</span>
             </div>
           </div>
-          <p className="mt-4 text-gray-500 text-sm">Carregando tutores...</p>
+          <p className="mt-4 text-gray-500 text-sm">{t('tutors.loadingTutors')}</p>
         </div>
       )}
 
@@ -193,15 +195,15 @@ const TutorListPage = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-red-800 mb-2">Erro ao carregar</h3>
+          <h3 className="text-lg font-medium text-red-800 mb-2">{t('tutors.loadError')}</h3>
           <p className="text-red-600 text-sm mb-4">
-            {error instanceof Error ? error.message : 'Erro desconhecido'}
+            {error instanceof Error ? error.message : t('common.unknownError')}
           </p>
           <button
             onClick={() => window.location.reload()}
             className="px-5 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
           >
-            Tentar novamente
+            {t('common.tryAgain')}
           </button>
         </div>
       )}
@@ -211,12 +213,12 @@ const TutorListPage = () => {
         <div className="bg-gray-50 border border-gray-200 rounded-2xl p-12 text-center">
           <div className="text-6xl mb-4">👤</div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {hasActiveFilters ? 'Nenhum tutor encontrado' : 'Nenhum tutor cadastrado'}
+            {hasActiveFilters ? t('tutors.noTutorsFound') : t('tutors.noTutorsRegistered')}
           </h3>
           <p className="text-gray-500 mb-6">
             {hasActiveFilters
-              ? 'Nao encontramos tutores com os filtros aplicados'
-              : 'Comece cadastrando seu primeiro tutor!'}
+              ? t('tutors.noFilterResults')
+              : t('tutors.startRegistering')}
           </p>
           {hasActiveFilters ? (
             <button
@@ -226,14 +228,14 @@ const TutorListPage = () => {
               }}
               className="inline-flex px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors"
             >
-              Limpar filtros
+              {t('common.clearFilters')}
             </button>
           ) : (
             <Link
               to={ROUTES.TUTORES.NEW}
               className="inline-flex px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
             >
-              Cadastrar Tutor
+              {t('tutors.registerTutor')}
             </Link>
           )}
         </div>
@@ -262,8 +264,7 @@ const TutorListPage = () => {
             />
 
             <p className="text-sm text-gray-500 bg-gray-100 px-4 py-2 rounded-full">
-              Mostrando <span className="font-medium text-gray-700">{data.content.length}</span> de{' '}
-              <span className="font-medium text-gray-700">{data.total}</span> tutores
+              {t('common.showing', { current: data.content.length, total: data.total })} {t('tutors.tutors')}
             </p>
           </div>
         </>
@@ -282,9 +283,9 @@ const TutorListPage = () => {
             {/* Modal Header */}
             <div className="p-4 border-b border-gray-200 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Vincular Pet</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{t('tutors.linkPetTitle')}</h2>
                 <p className="text-sm text-gray-500">
-                  Selecione um pet para vincular a {selectedTutor.nome}
+                  {t('tutors.selectPetToLink', { name: selectedTutor.nome })}
                 </p>
               </div>
               <button
@@ -315,7 +316,7 @@ const TutorListPage = () => {
                 type="text"
                 value={petSearchTerm}
                 onChange={(e) => setPetSearchTerm(e.target.value)}
-                placeholder="Buscar pet por nome..."
+                placeholder={t('tutors.searchPetByName')}
                 className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
 
@@ -327,7 +328,7 @@ const TutorListPage = () => {
                   </div>
                 ) : filteredAvailablePets.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
-                    <p>Nenhum pet disponivel para vincular</p>
+                    <p>{t('tutors.noPetsAvailable')}</p>
                   </div>
                 ) : (
                   filteredAvailablePets.map((pet) => (
@@ -375,7 +376,7 @@ const TutorListPage = () => {
                 onClick={handleCloseLinkModal}
                 className="w-full py-2 px-4 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition-colors"
               >
-                Cancelar
+                {t('common.cancel')}
               </button>
             </div>
           </div>
@@ -385,10 +386,10 @@ const TutorListPage = () => {
       {/* Delete Confirmation Modal */}
       <ConfirmModal
         isOpen={!!tutorToDelete}
-        title="Excluir Tutor"
-        message={`Tem certeza que deseja excluir ${tutorToDelete?.nome || 'este tutor'}? Esta acao nao pode ser desfeita.`}
-        confirmLabel="Excluir"
-        cancelLabel="Cancelar"
+        title={t('tutors.deleteConfirmTitle')}
+        message={t('tutors.deleteConfirmMessage', { name: tutorToDelete?.nome || 'este tutor' })}
+        confirmLabel={t('common.delete')}
+        cancelLabel={t('common.cancel')}
         variant="danger"
         isLoading={deleteMutation.isPending}
         onConfirm={handleConfirmDelete}

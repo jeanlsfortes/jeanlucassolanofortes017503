@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { clsx } from 'clsx'
+import { useTranslation } from 'react-i18next'
 
 interface SearchInputProps {
   value: string
@@ -12,11 +13,14 @@ interface SearchInputProps {
 const SearchInput = ({
   value,
   onChange,
-  placeholder = 'Buscar...',
+  placeholder,
   debounceMs = 300,
   className,
 }: SearchInputProps) => {
+  const { t } = useTranslation()
   const [localValue, setLocalValue] = useState(value)
+
+  const defaultPlaceholder = placeholder || t('common.search')
 
   // Sync local value with external value
   useEffect(() => {
@@ -67,7 +71,7 @@ const SearchInput = ({
         type="text"
         value={localValue}
         onChange={handleChange}
-        placeholder={placeholder}
+        placeholder={defaultPlaceholder}
         className="w-full pl-10 pr-10 py-2.5 bg-white text-gray-900 placeholder-gray-400 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
       />
 

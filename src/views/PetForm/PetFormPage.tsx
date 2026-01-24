@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
+import { useTranslation } from 'react-i18next'
 
 import { petSchema, type PetFormData } from '@/utils/validators'
 import { petService } from '@/api/services/pet.service'
@@ -11,6 +12,7 @@ import { ROUTES } from '@/@core/configs/routes.config'
 import Input from '@/components/ui/Input/Input'
 
 const PetFormPage = () => {
+  const { t } = useTranslation()
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -69,7 +71,7 @@ const PetFormPage = () => {
       navigate(ROUTES.PETS.DETAIL(String(newPet.id)), { replace: true })
     },
     onError: (error: AxiosError<{ message?: string }>) => {
-      setApiError(error.response?.data?.message || 'Erro ao criar pet')
+      setApiError(error.response?.data?.message || t('pets.createError'))
     },
   })
 
@@ -87,7 +89,7 @@ const PetFormPage = () => {
       navigate(ROUTES.PETS.DETAIL(String(updatedPet.id)), { replace: true })
     },
     onError: (error: AxiosError<{ message?: string }>) => {
-      setApiError(error.response?.data?.message || 'Erro ao atualizar pet')
+      setApiError(error.response?.data?.message || t('pets.updateError'))
     },
   })
 
@@ -126,13 +128,13 @@ const PetFormPage = () => {
     if (file) {
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        setApiError('Por favor, selecione uma imagem valida')
+        setApiError(t('pets.invalidImage'))
         return
       }
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setApiError('A imagem deve ter no maximo 5MB')
+        setApiError(t('pets.imageTooLarge'))
         return
       }
 
@@ -183,12 +185,12 @@ const PetFormPage = () => {
             d="M10 19l-7-7m0 0l7-7m-7 7h18"
           />
         </svg>
-        <span>Voltar</span>
+        <span>{t('common.back')}</span>
       </button>
 
       {/* Title */}
       <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">
-        {isEditMode ? 'Editar Pet' : 'Novo Pet'}
+        {isEditMode ? t('pets.editPet') : t('pets.newPet')}
       </h1>
 
       {/* Form */}
@@ -204,7 +206,7 @@ const PetFormPage = () => {
           {/* Photo Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Foto do Pet
+              {t('pets.petPhoto')}
             </label>
             <div className="flex items-start gap-4">
               {/* Preview */}
@@ -280,10 +282,10 @@ const PetFormPage = () => {
                       d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
                     />
                   </svg>
-                  Selecionar foto
+                  {t('pets.selectPhoto')}
                 </label>
                 <p className="mt-2 text-xs text-gray-500">
-                  PNG, JPG ou GIF. Maximo 5MB.
+                  {t('pets.photoRequirements')}
                 </p>
               </div>
             </div>
@@ -291,27 +293,27 @@ const PetFormPage = () => {
 
           {/* Nome */}
           <Input
-            label="Nome *"
+            label={t('pets.nameRequired')}
             type="text"
-            placeholder="Nome do pet"
+            placeholder={t('pets.namePlaceholder')}
             error={errors.nome?.message}
             {...register('nome')}
           />
 
           {/* Raca */}
           <Input
-            label="Raca"
+            label={t('pets.breed')}
             type="text"
-            placeholder="Raca do pet (opcional)"
+            placeholder={t('pets.breedPlaceholder')}
             error={errors.raca?.message}
             {...register('raca')}
           />
 
           {/* Idade */}
           <Input
-            label="Idade (anos)"
+            label={t('pets.ageYears')}
             type="number"
-            placeholder="Idade em anos (opcional)"
+            placeholder={t('pets.agePlaceholder')}
             min={0}
             max={50}
             error={errors.idade?.message}
@@ -325,7 +327,7 @@ const PetFormPage = () => {
               onClick={() => navigate(-1)}
               className="px-6 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
             >
-              Cancelar
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
@@ -333,10 +335,10 @@ const PetFormPage = () => {
               className="px-6 py-2.5 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting
-                ? 'Salvando...'
+                ? t('common.saving')
                 : isEditMode
-                  ? 'Salvar Alteracoes'
-                  : 'Cadastrar Pet'}
+                  ? t('pets.saveChanges')
+                  : t('pets.registerPet')}
             </button>
           </div>
         </form>
@@ -346,4 +348,3 @@ const PetFormPage = () => {
 }
 
 export default PetFormPage
-

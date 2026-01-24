@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { Pet } from '@/api/types/pet.types'
 import { ROUTES } from '@/@core/configs/routes.config'
 
@@ -8,6 +9,7 @@ interface PetCardProps {
 }
 
 const PetCard = ({ pet, onDelete }: PetCardProps) => {
+  const { t } = useTranslation()
   const placeholderImage =
     'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&q=80'
 
@@ -41,7 +43,7 @@ const PetCard = ({ pet, onDelete }: PetCardProps) => {
               onDelete(pet)
             }}
             className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all duration-300 shadow-lg z-10"
-            title="Excluir pet"
+            title={t('pets.deletePetTooltip')}
           >
             <svg
               className="w-4 h-4"
@@ -89,7 +91,7 @@ const PetCard = ({ pet, onDelete }: PetCardProps) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>
-                {pet.idade} {pet.idade === 1 ? 'ano' : 'anos'}
+                {pet.idade} {pet.idade === 1 ? t('common.year') : t('common.years')}
               </span>
             </p>
           )}
