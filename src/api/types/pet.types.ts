@@ -1,34 +1,42 @@
-export interface Pet {
-  id: string
+export interface PetPhoto {
+  id: number
   nome: string
-  especie: string
+  contentType: string
+  url: string
+}
+
+export interface Pet {
+  id: number
+  nome: string
   raca?: string
   idade?: number
-  fotoUrl?: string
-  tutorId?: string
-  createdAt?: string
-  updatedAt?: string
+  foto?: PetPhoto
 }
 
 export interface PetCreateRequest {
   nome: string
-  especie: string
   raca?: string
   idade?: number
 }
 
 export interface PetUpdateRequest {
   nome?: string
-  especie?: string
   raca?: string
   idade?: number
 }
 
 export interface PetListResponse {
-  data: Pet[]
-  total: number
   page: number
-  pageSize: number
+  size: number
+  total: number
+  pageCount: number
+  content: Pet[]
+}
+
+export interface PetListParams {
+  page?: number
+  size?: number
+  nome?: string
 }
 
 export interface PetPhotoUpload {

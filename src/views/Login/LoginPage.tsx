@@ -32,16 +32,15 @@ const LoginPage = () => {
     mutationFn: authService.login,
     onSuccess: (data) => {
       login({
-        token: data.token,
-        refreshToken: data.refreshToken,
-        expiration: data.expiration,
-        user: data.user,
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+        expires_in: data.expires_in,
       })
       navigate(ROUTES.HOME, { replace: true })
     },
     onError: (error: AxiosError<{ message?: string }>) => {
       if (error.response?.status === 401) {
-        setApiError('Username ou senha inválidos')
+        setApiError('Username ou senha invalidos')
       } else if (error.response?.data?.message) {
         setApiError(error.response.data.message)
       } else {

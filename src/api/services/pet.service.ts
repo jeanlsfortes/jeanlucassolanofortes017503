@@ -5,15 +5,12 @@ import type {
   PetCreateRequest,
   PetUpdateRequest,
   PetListResponse,
+  PetListParams,
   PetPhotoUpload,
 } from '../types/pet.types'
 
 class PetService {
-  async list(params?: {
-    page?: number
-    pageSize?: number
-    nome?: string
-  }): Promise<PetListResponse> {
+  async list(params?: PetListParams): Promise<PetListResponse> {
     const response = await apiClient.get<PetListResponse>(
       API_CONFIG.ENDPOINTS.PETS.BASE,
       { params }
@@ -21,9 +18,9 @@ class PetService {
     return response.data
   }
 
-  async getById(id: string): Promise<Pet> {
+  async getById(id: number): Promise<Pet> {
     const response = await apiClient.get<Pet>(
-      API_CONFIG.ENDPOINTS.PETS.BY_ID(id)
+      API_CONFIG.ENDPOINTS.PETS.BY_ID(String(id))
     )
     return response.data
   }
@@ -36,24 +33,24 @@ class PetService {
     return response.data
   }
 
-  async update(id: string, data: PetUpdateRequest): Promise<Pet> {
+  async update(id: number, data: PetUpdateRequest): Promise<Pet> {
     const response = await apiClient.put<Pet>(
-      API_CONFIG.ENDPOINTS.PETS.BY_ID(id),
+      API_CONFIG.ENDPOINTS.PETS.BY_ID(String(id)),
       data
     )
     return response.data
   }
 
-  async delete(id: string): Promise<void> {
-    await apiClient.delete(API_CONFIG.ENDPOINTS.PETS.BY_ID(id))
+  async delete(id: number): Promise<void> {
+    await apiClient.delete(API_CONFIG.ENDPOINTS.PETS.BY_ID(String(id)))
   }
 
-  async uploadPhoto(id: string, photo: PetPhotoUpload): Promise<Pet> {
+  async uploadPhoto(id: number, photo: PetPhotoUpload): Promise<Pet> {
     const formData = new FormData()
     formData.append('file', photo.file)
 
     const response = await apiClient.post<Pet>(
-      API_CONFIG.ENDPOINTS.PETS.PHOTO(id),
+      API_CONFIG.ENDPOINTS.PETS.PHOTO(String(id)),
       formData,
       {
         headers: {

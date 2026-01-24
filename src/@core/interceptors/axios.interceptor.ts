@@ -14,10 +14,10 @@ export const apiClient = axios.create({
 // Request interceptor
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = useAuthStore.getState().token
+    const accessToken = useAuthStore.getState().accessToken
     
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`
+    if (accessToken && config.headers) {
+      config.headers.Authorization = `Bearer ${accessToken}`
     }
     
     return config
@@ -43,14 +43,20 @@ apiClient.interceptors.response.use(
         if (refreshToken) {
           const response = await axios.post(
             `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.REFRESH}`,
-            { refreshToken }
+            { refresh_token: refreshToken }
           )
 
-          const { token } = response.data
-          useAuthStore.getState().setToken(token)
+          const { access_token, refresh_token, expires_in } = response.data
+          
+          // Update tokens in store
+          useAuthStore.getState().login({
+            access_token,
+            refresh_token,
+            expires_in,
+          })
 
           if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${token}`
+            originalRequest.headers.Authorization = `Bearer ${access_token}`
           }
 
           return apiClient(originalRequest)

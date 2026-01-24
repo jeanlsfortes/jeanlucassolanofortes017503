@@ -4,7 +4,7 @@ import { ROUTES } from '@/@core/configs/routes.config'
 
 const MainLayout = () => {
   const navigate = useNavigate()
-  const { logout, user } = useAuthStore()
+  const logout = useAuthStore((state) => state.logout)
 
   const handleLogout = () => {
     logout()
@@ -39,9 +39,6 @@ const MainLayout = () => {
               </div>
             </div>
             <div className="flex items-center">
-              <span className="text-sm text-gray-700 mr-4">
-                {user?.name || 'Usuário'}
-              </span>
               <button
                 onClick={handleLogout}
                 className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-primary-600"

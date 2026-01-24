@@ -4,22 +4,20 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  token: string
-  refreshToken: string
-  expiration: string
-  user: {
-    id: string
-    email: string
-    name: string
-  }
+  access_token: string
+  refresh_token: string
+  expires_in: number
+  refresh_expires_in: number
 }
 
 export interface RefreshTokenRequest {
-  refreshToken: string
+  refresh_token: string
 }
 
 export interface RefreshTokenResponse {
-  token: string
-  expiration: string
+  access_token: string
+  refresh_token: string
+  expires_in: number
+  refresh_expires_in: number
 }
 

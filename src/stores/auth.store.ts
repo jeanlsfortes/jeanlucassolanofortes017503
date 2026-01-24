@@ -2,24 +2,16 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
 interface AuthState {
-  token: string | null
+  accessToken: string | null
   refreshToken: string | null
-  expiration: string | null
-  user: {
-    id: string
-    email: string
-    name: string
-  } | null
+  expiresAt: number | null
   isAuthenticated: boolean
-  setToken: (token: string) => void
+  setAccessToken: (token: string) => void
   setRefreshToken: (refreshToken: string) => void
-  setExpiration: (expiration: string) => void
-  setUser: (user: { id: string; email: string; name: string }) => void
   login: (data: {
-    token: string
-    refreshToken: string
-    expiration: string
-    user: { id: string; email: string; name: string }
+    access_token: string
+    refresh_token: string
+    expires_in: number
   }) => void
   logout: () => void
 }
@@ -27,32 +19,27 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      token: null,
+      accessToken: null,
       refreshToken: null,
-      expiration: null,
-      user: null,
+      expiresAt: null,
       isAuthenticated: false,
 
-      setToken: (token) => set({ token }),
+      setAccessToken: (accessToken) => set({ accessToken }),
       setRefreshToken: (refreshToken) => set({ refreshToken }),
-      setExpiration: (expiration) => set({ expiration }),
-      setUser: (user) => set({ user }),
 
       login: (data) =>
         set({
-          token: data.token,
-          refreshToken: data.refreshToken,
-          expiration: data.expiration,
-          user: data.user,
+          accessToken: data.access_token,
+          refreshToken: data.refresh_token,
+          expiresAt: Date.now() + data.expires_in * 1000,
           isAuthenticated: true,
         }),
 
       logout: () =>
         set({
-          token: null,
+          accessToken: null,
           refreshToken: null,
-          expiration: null,
-          user: null,
+          expiresAt: null,
           isAuthenticated: false,
         }),
     }),
