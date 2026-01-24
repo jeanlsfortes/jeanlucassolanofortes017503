@@ -57,11 +57,11 @@ const LoginPage = () => {
   return (
     <div className="w-full bg-white rounded-2xl shadow-xl p-6 sm:p-8">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-          Welcome Back
+      <div className="mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
+          Welcome Back <span className="text-2xl">👋</span>
         </h1>
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-3 text-sm text-gray-500 leading-relaxed">
           Today is a new day. It's your day. You shape it.
           <br />
           Sign in to start managing your projects.
@@ -69,7 +69,7 @@ const LoginPage = () => {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {apiError && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
             {apiError}
@@ -77,9 +77,9 @@ const LoginPage = () => {
         )}
 
         <Input
-          label="Username"
+          label="Email"
           type="text"
-          placeholder="admin"
+          placeholder="Example@email.com"
           error={errors.username?.message}
           {...register('username')}
         />
@@ -92,7 +92,7 @@ const LoginPage = () => {
             error={errors.password?.message}
             {...register('password')}
           />
-          <div className="mt-1 text-right">
+          <div className="mt-2 text-right">
             <a
               href="#"
               className="text-sm text-blue-600 hover:text-blue-700 font-medium"
@@ -105,7 +105,7 @@ const LoginPage = () => {
         <button
           type="submit"
           disabled={loginMutation.isPending}
-          className="w-full py-3 px-4 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-3 px-4 bg-[#162D3A] hover:bg-[#1a3847] text-white font-medium rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
         </button>
@@ -119,10 +119,10 @@ const LoginPage = () => {
       </div>
 
       {/* Social Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-row gap-3">
         <button
           type="button"
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
@@ -147,7 +147,7 @@ const LoginPage = () => {
 
         <button
           type="button"
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors"
         >
           <svg className="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
             <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
@@ -157,7 +157,7 @@ const LoginPage = () => {
       </div>
 
       {/* Sign up link */}
-      <p className="mt-6 text-center text-sm text-gray-500">
+      <p className="mt-8 text-center text-sm text-gray-500">
         Don't you have an account?{' '}
         <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
           Sign up
@@ -165,8 +165,8 @@ const LoginPage = () => {
       </p>
 
       {/* Footer */}
-      <p className="mt-8 text-center text-xs text-gray-400">
-        {new Date().getFullYear()} ALL RIGHTS RESERVED
+      <p className="mt-10 text-center text-xs text-gray-400 tracking-wide">
+        © {new Date().getFullYear()} ALL RIGHTS RESERVED
       </p>
     </div>
   )

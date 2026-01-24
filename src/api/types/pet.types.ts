@@ -51,6 +51,7 @@ export interface PetListParams {
   page?: number
   size?: number
   nome?: string
+  raca?: string
 }
 
 export interface PetPhotoUpload {
