@@ -6,6 +6,10 @@ export const API_CONFIG = {
       LOGIN: '/autenticacao/login',
       REFRESH: '/autenticacao/refresh',
     },
+    HEALTH: {
+      LIVE: '/health/live',
+      READY: '/health/ready',
+    },
     PETS: {
       BASE: '/v1/pets',
       BY_ID: (id: string) => `/v1/pets/${id}`,
