@@ -1,31 +1,45 @@
+import type { Pet, PetPhoto } from './pet.types'
+
+export interface TutorPhoto {
+  id: number
+  nome: string
+  contentType: string
+  url: string
+}
+
 export interface Tutor {
-  id: string
-  nomeCompleto: string
-  telefone: string
+  id: number
+  nome: string
+  email?: string
+  telefone?: string
   endereco?: string
-  fotoUrl?: string
-  pets?: string[]
-  createdAt?: string
-  updatedAt?: string
+  cpf?: number
+  foto?: TutorPhoto
+  pets?: Pet[]
 }
 
 export interface TutorCreateRequest {
-  nomeCompleto: string
-  telefone: string
+  nome: string
+  email?: string
+  telefone?: string
   endereco?: string
+  cpf?: number
 }
 
 export interface TutorUpdateRequest {
-  nomeCompleto?: string
+  nome?: string
+  email?: string
   telefone?: string
   endereco?: string
+  cpf?: number
 }
 
 export interface TutorListResponse {
-  data: Tutor[]
-  total: number
   page: number
-  pageSize: number
+  size: number
+  total: number
+  pageCount: number
+  content: Tutor[]
 }
 
 export interface TutorPhotoUpload {

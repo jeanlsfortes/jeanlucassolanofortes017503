@@ -13,6 +13,20 @@ export interface Pet {
   foto?: PetPhoto
 }
 
+export interface TutorEmbed {
+  id: number
+  nome: string
+  email?: string
+  telefone?: string
+  endereco?: string
+  cpf?: number
+  foto?: PetPhoto
+}
+
+export interface PetDetail extends Pet {
+  tutores?: TutorEmbed[]
+}
+
 export interface PetCreateRequest {
   nome: string
   raca?: string

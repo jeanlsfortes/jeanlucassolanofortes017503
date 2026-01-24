@@ -2,6 +2,7 @@ import apiClient from '@/@core/interceptors/axios.interceptor'
 import { API_CONFIG } from '@/@core/configs/api.config'
 import type {
   Pet,
+  PetDetail,
   PetCreateRequest,
   PetUpdateRequest,
   PetListResponse,
@@ -18,8 +19,8 @@ class PetService {
     return response.data
   }
 
-  async getById(id: number): Promise<Pet> {
-    const response = await apiClient.get<Pet>(
+  async getById(id: number): Promise<PetDetail> {
+    const response = await apiClient.get<PetDetail>(
       API_CONFIG.ENDPOINTS.PETS.BY_ID(String(id))
     )
     return response.data

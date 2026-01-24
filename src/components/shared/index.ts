@@ -4,4 +4,5 @@ export { default as GuestRoute } from './GuestRoute/GuestRoute'
 export { default as ErrorBoundary } from './ErrorBoundary/ErrorBoundary'
 export { default as HealthCheck } from './HealthCheck/HealthCheck'
 export { default as PetCard } from './PetCard/PetCard'
+export { default as TutorCard } from './TutorCard/TutorCard'
 
