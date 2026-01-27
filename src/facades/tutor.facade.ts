@@ -1,13 +1,15 @@
 import { Observable } from 'rxjs'
-import { tutorService, type TutorListParams } from '@/api/services/tutor.service'
+import { tutorService } from '@/api/services/tutor.service'
 import { tutorState$, tutorStateActions, type TutorState } from '@/state/tutor.state'
 import type {
   Tutor,
   TutorCreateRequest,
   TutorUpdateRequest,
   TutorPhotoUpload,
+  TutorListParams,
 } from '@/api/types/tutor.types'
 import type { Pet } from '@/api/types/pet.types'
+import { extractErrorMessage } from '@/utils/error.utils'
 
 /**
  * TutorFacade - Provides a unified interface for tutor operations
@@ -37,10 +39,11 @@ class TutorFacade {
       const response = await tutorService.list(params)
       tutorStateActions.setTutors(response)
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Erro ao carregar tutores'
+      const message = extractErrorMessage(error, 'tutors.loadError')
       tutorStateActions.setError(message)
       throw error
+    } finally {
+      tutorStateActions.setLoading(false)
     }
   }
 
@@ -48,15 +51,17 @@ class TutorFacade {
    * Get tutor by ID
    */
   async getTutorById(id: number): Promise<Tutor> {
+    tutorStateActions.setLoading(true)
     try {
       const tutor = await tutorService.getById(id)
       tutorStateActions.setSelectedTutor(tutor)
       return tutor
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Erro ao carregar tutor'
+      const message = extractErrorMessage(error, 'tutors.loadError')
       tutorStateActions.setError(message)
       throw error
+    } finally {
+      tutorStateActions.setLoading(false)
     }
   }
 
@@ -68,13 +73,13 @@ class TutorFacade {
     try {
       const newTutor = await tutorService.create(data)
       tutorStateActions.addTutor(newTutor)
-      tutorStateActions.setLoading(false)
       return newTutor
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Erro ao criar tutor'
+      const message = extractErrorMessage(error, 'tutors.createError')
       tutorStateActions.setError(message)
       throw error
+    } finally {
+      tutorStateActions.setLoading(false)
     }
   }
 
@@ -86,13 +91,13 @@ class TutorFacade {
     try {
       const updatedTutor = await tutorService.update(id, data)
       tutorStateActions.updateTutor(id, updatedTutor)
-      tutorStateActions.setLoading(false)
       return updatedTutor
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Erro ao atualizar tutor'
+      const message = extractErrorMessage(error, 'tutors.updateError')
       tutorStateActions.setError(message)
       throw error
+    } finally {
+      tutorStateActions.setLoading(false)
     }
   }
 
@@ -104,12 +109,12 @@ class TutorFacade {
     try {
       await tutorService.delete(id)
       tutorStateActions.removeTutor(id)
-      tutorStateActions.setLoading(false)
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Erro ao excluir tutor'
+      const message = extractErrorMessage(error, 'tutors.deleteError')
       tutorStateActions.setError(message)
       throw error
+    } finally {
+      tutorStateActions.setLoading(false)
     }
   }
 
@@ -117,15 +122,17 @@ class TutorFacade {
    * Upload tutor photo
    */
   async uploadPhoto(id: number, photo: TutorPhotoUpload): Promise<Tutor> {
+    tutorStateActions.setLoading(true)
     try {
       const updatedTutor = await tutorService.uploadPhoto(id, photo)
       tutorStateActions.updateTutor(id, updatedTutor)
       return updatedTutor
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Erro ao enviar foto'
+      const message = extractErrorMessage(error, 'common.error')
       tutorStateActions.setError(message)
       throw error
+    } finally {
+      tutorStateActions.setLoading(false)
     }
   }
 
@@ -133,15 +140,17 @@ class TutorFacade {
    * Link a pet to a tutor
    */
   async linkPet(tutorId: number, petId: number): Promise<void> {
+    tutorStateActions.setLoading(true)
     try {
       await tutorService.linkPet(tutorId, petId)
       // Reload tutor to get updated pet list
       await this.getTutorById(tutorId)
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Erro ao vincular pet'
+      const message = extractErrorMessage(error, 'tutors.linkError')
       tutorStateActions.setError(message)
       throw error
+    } finally {
+      tutorStateActions.setLoading(false)
     }
   }
 
@@ -149,21 +158,23 @@ class TutorFacade {
    * Unlink a pet from a tutor
    */
   async unlinkPet(tutorId: number, petId: number): Promise<void> {
+    tutorStateActions.setLoading(true)
     try {
       await tutorService.unlinkPet(tutorId, petId)
-      // Update local state
-      const tutor = this.currentState.selectedTutor
+      // Update local state - updateTutor will also update selectedTutor if it matches
+      const currentState = this.currentState
+      const tutor = currentState.tutors.find((t) => t.id === tutorId) || currentState.selectedTutor
       if (tutor && tutor.id === tutorId) {
         tutorStateActions.updateTutor(tutorId, {
-          ...tutor,
           pets: tutor.pets?.filter((p) => p.id !== petId),
         })
       }
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Erro ao desvincular pet'
+      const message = extractErrorMessage(error, 'tutors.unlinkError')
       tutorStateActions.setError(message)
       throw error
+    } finally {
+      tutorStateActions.setLoading(false)
     }
   }
 
@@ -171,13 +182,15 @@ class TutorFacade {
    * Get pets for a tutor
    */
   async getTutorPets(tutorId: number): Promise<Pet[]> {
+    tutorStateActions.setLoading(true)
     try {
       return await tutorService.getPets(tutorId)
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Erro ao carregar pets do tutor'
+      const message = extractErrorMessage(error, 'pets.loadError')
       tutorStateActions.setError(message)
       throw error
+    } finally {
+      tutorStateActions.setLoading(false)
     }
   }
 

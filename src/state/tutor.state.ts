@@ -54,11 +54,18 @@ export const tutorStateActions = {
 
   updateTutor: (id: number, updatedTutor: Partial<Tutor>) => {
     const current = tutorState$.getValue()
+    const updatedTutors = current.tutors.map((tutor) =>
+      tutor.id === id ? { ...tutor, ...updatedTutor } : tutor
+    )
+    const updatedSelectedTutor =
+      current.selectedTutor?.id === id
+        ? { ...current.selectedTutor, ...updatedTutor }
+        : current.selectedTutor
+
     tutorState$.next({
       ...current,
-      tutors: current.tutors.map((tutor) =>
-        tutor.id === id ? { ...tutor, ...updatedTutor } : tutor
-      ),
+      tutors: updatedTutors,
+      selectedTutor: updatedSelectedTutor,
     })
   },
 

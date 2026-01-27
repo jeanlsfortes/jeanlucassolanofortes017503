@@ -19,7 +19,7 @@ export interface TutorEmbed {
   email?: string
   telefone?: string
   endereco?: string
-  cpf?: number
+  cpf?: string
   foto?: PetPhoto
 }
 

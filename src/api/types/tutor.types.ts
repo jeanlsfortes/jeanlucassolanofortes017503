@@ -13,7 +13,7 @@ export interface Tutor {
   email?: string
   telefone?: string
   endereco?: string
-  cpf?: number
+  cpf?: string
   foto?: TutorPhoto
   pets?: Pet[]
 }
@@ -23,7 +23,7 @@ export interface TutorCreateRequest {
   email?: string
   telefone?: string
   endereco?: string
-  cpf?: number
+  cpf?: string
 }
 
 export interface TutorUpdateRequest {
@@ -31,7 +31,13 @@ export interface TutorUpdateRequest {
   email?: string
   telefone?: string
   endereco?: string
-  cpf?: number
+  cpf?: string
+}
+
+export interface TutorListParams {
+  page?: number
+  size?: number
+  nome?: string
 }
 
 export interface TutorListResponse {

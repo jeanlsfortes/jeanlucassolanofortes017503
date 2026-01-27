@@ -1,8 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { tutorFacade } from '@/facades/tutor.facade'
 import type { TutorState } from '@/state/tutor.state'
-import type { TutorCreateRequest, TutorUpdateRequest, TutorPhotoUpload } from '@/api/types/tutor.types'
-import type { TutorListParams } from '@/api/services/tutor.service'
+import type {
+  TutorCreateRequest,
+  TutorUpdateRequest,
+  TutorPhotoUpload,
+  TutorListParams,
+} from '@/api/types/tutor.types'
 
 /**
  * Hook to access reactive tutor state and actions
