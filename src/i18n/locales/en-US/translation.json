@@ -115,6 +115,8 @@
     "searchPetByName": "Search pet by name...",
     "noPetsAvailable": "No pets available to link",
     "noPetsAvailableShort": "No pets available",
+    "loadPetsError": "Error loading pet list",
+    "allPetsAlreadyLinked": "All pets are already linked to this tutor",
     "noPetsLinked": "No pets linked",
     "removeLink": "Remove link",
     "removeLinkConfirm": "Do you want to remove the link with this pet?",

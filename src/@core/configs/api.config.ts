@@ -9,6 +9,7 @@ export const API_CONFIG = {
     HEALTH: {
       LIVE: '/health/live',
       READY: '/health/ready',
+      BASE: '/health',
     },
     PETS: {
       BASE: '/v1/pets',

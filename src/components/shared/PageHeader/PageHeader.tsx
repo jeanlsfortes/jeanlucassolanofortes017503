@@ -32,7 +32,7 @@ const PageHeader = ({
 
   const patterns = {
     pets: (
-      <>
+      <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <pattern id="paw-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
             <circle cx="5" cy="5" r="2" fill="currentColor" />
@@ -40,19 +40,19 @@ const PageHeader = ({
             <circle cx="10" cy="12" r="3" fill="currentColor" />
           </pattern>
         </defs>
-        <rect width="100" height="100" fill="url(#paw-pattern)" />
-      </>
+        <rect width="100%" height="100%" fill="url(#paw-pattern)" />
+      </svg>
     ),
     tutors: (
-      <>
+      <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <pattern id="people-pattern" x="0" y="0" width="25" height="25" patternUnits="userSpaceOnUse">
             <circle cx="12.5" cy="8" r="4" fill="currentColor" />
             <path d="M5 22 Q12.5 15 20 22" stroke="currentColor" strokeWidth="2" fill="none" />
           </pattern>
         </defs>
-        <rect width="100" height="100" fill="url(#people-pattern)" />
-      </>
+        <rect width="100%" height="100%" fill="url(#people-pattern)" />
+      </svg>
     ),
     default: null,
   }

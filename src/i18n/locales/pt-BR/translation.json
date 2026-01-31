@@ -115,6 +115,8 @@
     "searchPetByName": "Buscar pet por nome...",
     "noPetsAvailable": "Nenhum pet disponivel para vincular",
     "noPetsAvailableShort": "Nenhum pet disponivel",
+    "loadPetsError": "Erro ao carregar lista de pets",
+    "allPetsAlreadyLinked": "Todos os pets ja estao vinculados a este tutor",
     "noPetsLinked": "Nenhum pet vinculado",
     "removeLink": "Remover vinculo",
     "removeLinkConfirm": "Deseja remover o vinculo com este pet?",

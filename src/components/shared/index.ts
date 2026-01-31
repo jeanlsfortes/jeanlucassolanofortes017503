@@ -7,4 +7,6 @@ export { default as PetCard } from './PetCard/PetCard'
 export { default as TutorCard } from './TutorCard/TutorCard'
 export { default as TutorListCard } from './TutorListCard/TutorListCard'
 export { default as PageHeader } from './PageHeader/PageHeader'
+export { default as LinkedPetsSelector } from './LinkedPetsSelector/LinkedPetsSelector'
+export { default as LinkPetModal } from './LinkPetModal/LinkPetModal'
 

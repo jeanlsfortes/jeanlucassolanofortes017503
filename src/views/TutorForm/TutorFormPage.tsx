@@ -8,12 +8,12 @@ import { useTranslation } from 'react-i18next'
 
 import { tutorSchema, type TutorFormData } from '@/utils/validators'
 import { tutorService } from '@/api/services/tutor.service'
-import { petService } from '@/api/services/pet.service'
 import { ROUTES } from '@/@core/configs/routes.config'
 import { applyPhoneMask } from '@/utils/masks'
 import Input from '@/components/ui/Input/Input'
 import ConfirmModal from '@/components/ui/ConfirmModal/ConfirmModal'
-import type { Pet } from '@/api/types/pet.types'
+import LinkedPetsSelector from '@/components/shared/LinkedPetsSelector/LinkedPetsSelector'
+import LinkPetModal from '@/components/shared/LinkPetModal/LinkPetModal'
 
 const TutorFormPage = () => {
   const { t } = useTranslation()
@@ -30,22 +30,13 @@ const TutorFormPage = () => {
   const [phoneDisplay, setPhoneDisplay] = useState('')
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
-  // Pet linking states
-  const [showPetSelector, setShowPetSelector] = useState(false)
-  const [petSearchTerm, setPetSearchTerm] = useState('')
+  const [showLinkPetModal, setShowLinkPetModal] = useState(false)
 
   // Fetch tutor data for edit mode
   const { data: tutorData, isLoading: isLoadingTutor } = useQuery({
     queryKey: ['tutor', id],
     queryFn: () => tutorService.getById(Number(id)),
     enabled: isEditMode,
-  })
-
-  // Fetch available pets for linking
-  const { data: availablePets } = useQuery({
-    queryKey: ['pets', 'available', petSearchTerm],
-    queryFn: () => petService.list({ page: 0, size: 50, nome: petSearchTerm || undefined }),
-    enabled: showPetSelector,
   })
 
   const {
@@ -111,20 +102,6 @@ const TutorFormPage = () => {
     },
     onError: (error: AxiosError<{ message?: string }>) => {
       setApiError(error.response?.data?.message || t('tutors.updateError'))
-    },
-  })
-
-  // Link pet mutation
-  const linkPetMutation = useMutation({
-    mutationFn: ({ tutorId, petId }: { tutorId: number; petId: number }) =>
-      tutorService.linkPet(tutorId, petId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tutor', id] })
-      setShowPetSelector(false)
-      setPetSearchTerm('')
-    },
-    onError: (error: AxiosError<{ message?: string }>) => {
-      setApiError(error.response?.data?.message || t('tutors.linkError'))
     },
   })
 
@@ -219,12 +196,6 @@ const TutorFormPage = () => {
     }
   }
 
-  const handleLinkPet = (pet: Pet) => {
-    if (id) {
-      linkPetMutation.mutate({ tutorId: Number(id), petId: pet.id })
-    }
-  }
-
   const handleUnlinkPet = (petId: number) => {
     if (id && confirm(t('tutors.removeLinkConfirm'))) {
       unlinkPetMutation.mutate({ tutorId: Number(id), petId })
@@ -233,10 +204,6 @@ const TutorFormPage = () => {
 
   const isSubmitting =
     createMutation.isPending || updateMutation.isPending || isUploadingPhoto
-
-  const linkedPetIds = tutorData?.pets?.map((p) => p.id) || []
-  const filteredAvailablePets =
-    availablePets?.content.filter((p) => !linkedPetIds.includes(p.id)) || []
 
   if (isEditMode && isLoadingTutor) {
     return (
@@ -406,104 +373,28 @@ const TutorFormPage = () => {
         </div>
 
         {/* Linked Pets Section (Edit Mode Only) */}
-        {isEditMode && (
+        {isEditMode && tutorData && (
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">{t('tutors.linkedPets')}</h2>
-                <button
-                  type="button"
-                  onClick={() => setShowPetSelector(!showPetSelector)}
-                  className="px-3 py-1.5 text-sm bg-gray-900 text-white rounded-lg hover:bg-gray-800"
-                >
-                  {t('tutors.linkPet')}
-                </button>
-              </div>
-
-              {/* Pet Selector */}
-              {showPetSelector && (
-                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                  <input
-                    type="text"
-                    value={petSearchTerm}
-                    onChange={(e) => setPetSearchTerm(e.target.value)}
-                    placeholder={t('tutors.searchPetByName')}
-                    className="w-full px-3 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-md mb-2"
-                  />
-                  <div className="max-h-40 overflow-y-auto space-y-1">
-                    {filteredAvailablePets.length === 0 ? (
-                      <p className="text-sm text-gray-500 text-center py-2">
-                        {t('tutors.noPetsAvailableShort')}
-                      </p>
-                    ) : (
-                      filteredAvailablePets.map((pet) => (
-                        <button
-                          key={pet.id}
-                          type="button"
-                          onClick={() => handleLinkPet(pet)}
-                          disabled={linkPetMutation.isPending}
-                          className="w-full flex items-center gap-2 p-2 text-left hover:bg-gray-100 rounded-md transition-colors"
-                        >
-                          <img
-                            src={pet.foto?.url || 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=100&q=80'}
-                            alt={pet.nome}
-                            className="w-8 h-8 rounded-full object-cover"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">{pet.nome}</p>
-                            {pet.raca && <p className="text-xs text-gray-500 truncate">{pet.raca}</p>}
-                          </div>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Linked Pets List */}
-              <div className="space-y-2">
-                {tutorData?.pets && tutorData.pets.length > 0 ? (
-                  tutorData.pets.map((pet) => (
-                    <div
-                      key={pet.id}
-                      className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg"
-                    >
-                      <Link to={ROUTES.PETS.DETAIL(String(pet.id))} className="flex-shrink-0">
-                        <img
-                          src={pet.foto?.url || 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=100&q=80'}
-                          alt={pet.nome}
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                      </Link>
-                      <div className="flex-1 min-w-0">
-                        <Link
-                          to={ROUTES.PETS.DETAIL(String(pet.id))}
-                          className="text-sm font-medium text-gray-900 hover:text-primary-600 truncate block"
-                        >
-                          {pet.nome}
-                        </Link>
-                        {pet.raca && <p className="text-xs text-gray-500 truncate">{pet.raca}</p>}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleUnlinkPet(pet.id)}
-                        disabled={unlinkPetMutation.isPending}
-                        className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
-                        title={t('tutors.removeLink')}
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-gray-500 text-center py-4">
-                    {t('tutors.noPetsLinked')}
-                  </p>
-                )}
-              </div>
-            </div>
+            <LinkedPetsSelector
+              linkedPets={tutorData.pets ?? []}
+              availablePets={[]}
+              searchValue=""
+              onSearchChange={() => {}}
+              onLinkPet={() => {}}
+              onUnlinkPet={handleUnlinkPet}
+              isUnlinking={unlinkPetMutation.isPending}
+              variant="inline"
+              onLinkClick={() => setShowLinkPetModal(true)}
+              showLinkButton
+            />
+            <LinkPetModal
+              tutor={tutorData}
+              isOpen={showLinkPetModal}
+              onClose={() => {
+                queryClient.invalidateQueries({ queryKey: ['tutor', id] })
+                setShowLinkPetModal(false)
+              }}
+            />
           </div>
         )}
       </div>

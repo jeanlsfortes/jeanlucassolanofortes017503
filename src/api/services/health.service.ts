@@ -33,45 +33,47 @@ class HealthService {
   }
 
   /**
+   * Single health check - uses /health (Kubernetes-style APIs often use /health/live and /health/ready,
+   * but this API uses /health)
+   */
+  private async checkHealth(): Promise<boolean> {
+    try {
+      const response = await apiClient.get(API_CONFIG.ENDPOINTS.HEALTH.BASE)
+      return response.status === 200
+    } catch {
+      return false
+    }
+  }
+
+  /**
    * Check liveness endpoint
    */
   async checkLiveness(): Promise<boolean> {
-    try {
-      const response = await apiClient.get(API_CONFIG.ENDPOINTS.HEALTH.LIVE)
-      const isHealthy = response.status === 200
-      this.updateStatus({ liveness: isHealthy ? 'healthy' : 'unhealthy' })
-      return isHealthy
-    } catch {
-      this.updateStatus({ liveness: 'unhealthy' })
-      return false
-    }
+    const isHealthy = await this.checkHealth()
+    this.updateStatus({ liveness: isHealthy ? 'healthy' : 'unhealthy' })
+    return isHealthy
   }
 
   /**
    * Check readiness endpoint
    */
   async checkReadiness(): Promise<boolean> {
-    try {
-      const response = await apiClient.get(API_CONFIG.ENDPOINTS.HEALTH.READY)
-      const isReady = response.status === 200
-      this.updateStatus({ readiness: isReady ? 'ready' : 'not-ready' })
-      return isReady
-    } catch {
-      this.updateStatus({ readiness: 'not-ready' })
-      return false
-    }
+    const isReady = await this.checkHealth()
+    this.updateStatus({ readiness: isReady ? 'ready' : 'not-ready' })
+    return isReady
   }
 
   /**
-   * Check both liveness and readiness
+   * Check both liveness and readiness (single request to /health)
    */
   async checkAll(): Promise<{ liveness: boolean; readiness: boolean }> {
-    const [liveness, readiness] = await Promise.all([
-      this.checkLiveness(),
-      this.checkReadiness(),
-    ])
-    this.updateStatus({ lastCheck: new Date() })
-    return { liveness, readiness }
+    const isHealthy = await this.checkHealth()
+    this.updateStatus({
+      liveness: isHealthy ? 'healthy' : 'unhealthy',
+      readiness: isHealthy ? 'ready' : 'not-ready',
+      lastCheck: new Date(),
+    })
+    return { liveness: isHealthy, readiness: isHealthy }
   }
 
   /**

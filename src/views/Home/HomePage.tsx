@@ -25,7 +25,7 @@ const HomePage = () => {
     queryKey: ['pets', page, nomeFilter, racaFilter],
     queryFn: () =>
       petService.list({
-        page,
+        page: page + 1,
         size: PAGE_SIZE,
         nome: nomeFilter || undefined,
         raca: racaFilter || undefined,
@@ -74,14 +74,16 @@ const HomePage = () => {
       <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-6 sm:p-8 mb-8 text-white relative overflow-hidden">
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-10">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <pattern id="paw-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+              <pattern id="paw-pattern-home" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
                 <circle cx="5" cy="5" r="2" fill="currentColor" />
                 <circle cx="15" cy="5" r="2" fill="currentColor" />
                 <circle cx="10" cy="12" r="3" fill="currentColor" />
               </pattern>
             </defs>
-            <rect width="100" height="100" fill="url(#paw-pattern)" />
+            <rect width="100%" height="100%" fill="url(#paw-pattern-home)" />
+          </svg>
         </div>
 
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
