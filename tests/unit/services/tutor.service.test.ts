@@ -147,8 +147,7 @@ describe('TutorService', () => {
 
       expect(apiClient.post).toHaveBeenCalledWith(
         '/v1/tutores/1/fotos',
-        expect.any(FormData),
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        expect.any(FormData)
       )
       expect(result).toEqual(tutorWithPhoto)
     })

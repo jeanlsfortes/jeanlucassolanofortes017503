@@ -32,13 +32,9 @@ class HealthService {
     return this.status$.getValue()
   }
 
-  /**
-   * Single health check - uses /health (Kubernetes-style APIs often use /health/live and /health/ready,
-   * but this API uses /health)
-   */
-  private async checkHealth(): Promise<boolean> {
+  private async checkEndpoint(endpoint: string): Promise<boolean> {
     try {
-      const response = await apiClient.get(API_CONFIG.ENDPOINTS.HEALTH.BASE)
+      const response = await apiClient.get(endpoint)
       return response.status === 200
     } catch {
       return false
@@ -49,7 +45,7 @@ class HealthService {
    * Check liveness endpoint
    */
   async checkLiveness(): Promise<boolean> {
-    const isHealthy = await this.checkHealth()
+    const isHealthy = await this.checkEndpoint(API_CONFIG.ENDPOINTS.HEALTH.LIVE)
     this.updateStatus({ liveness: isHealthy ? 'healthy' : 'unhealthy' })
     return isHealthy
   }
@@ -58,22 +54,25 @@ class HealthService {
    * Check readiness endpoint
    */
   async checkReadiness(): Promise<boolean> {
-    const isReady = await this.checkHealth()
+    const isReady = await this.checkEndpoint(API_CONFIG.ENDPOINTS.HEALTH.READY)
     this.updateStatus({ readiness: isReady ? 'ready' : 'not-ready' })
     return isReady
   }
 
   /**
-   * Check both liveness and readiness (single request to /health)
+   * Check both liveness and readiness (separate requests)
    */
   async checkAll(): Promise<{ liveness: boolean; readiness: boolean }> {
-    const isHealthy = await this.checkHealth()
+    const [liveness, readiness] = await Promise.all([
+      this.checkEndpoint(API_CONFIG.ENDPOINTS.HEALTH.LIVE),
+      this.checkEndpoint(API_CONFIG.ENDPOINTS.HEALTH.READY),
+    ])
     this.updateStatus({
-      liveness: isHealthy ? 'healthy' : 'unhealthy',
-      readiness: isHealthy ? 'ready' : 'not-ready',
+      liveness: liveness ? 'healthy' : 'unhealthy',
+      readiness: readiness ? 'ready' : 'not-ready',
       lastCheck: new Date(),
     })
-    return { liveness: isHealthy, readiness: isHealthy }
+    return { liveness, readiness }
   }
 
   /**

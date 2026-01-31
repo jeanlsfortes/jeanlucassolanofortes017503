@@ -137,8 +137,7 @@ describe('PetService', () => {
 
       expect(apiClient.post).toHaveBeenCalledWith(
         '/v1/pets/1/fotos',
-        expect.any(FormData),
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        expect.any(FormData)
       )
       expect(result).toEqual(petWithPhoto)
     })

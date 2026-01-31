@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -8,7 +8,7 @@ import { ROUTES } from '@/@core/configs/routes.config'
 import TutorListCard from '@/components/shared/TutorListCard/TutorListCard'
 import PageHeader from '@/components/shared/PageHeader/PageHeader'
 import SearchInput from '@/components/ui/SearchInput/SearchInput'
-import Pagination from '@/components/ui/Pagination/Pagination'
+import PaginationWithInfo from '@/components/ui/PaginationWithInfo/PaginationWithInfo'
 import ConfirmModal from '@/components/ui/ConfirmModal/ConfirmModal'
 import LinkPetModal from '@/components/shared/LinkPetModal/LinkPetModal'
 import type { Tutor } from '@/api/types/tutor.types'
@@ -29,7 +29,7 @@ const TutorListPage = () => {
     queryKey: ['tutors', page, searchTerm],
     queryFn: () =>
       tutorService.list({
-        page: page + 1,
+        page,
         size: PAGE_SIZE,
         nome: searchTerm || undefined,
       }),
@@ -64,6 +64,12 @@ const TutorListPage = () => {
     setPage(newPage - 1)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
+
+  useEffect(() => {
+    if (data && data.content.length === 0 && data.total > 0 && page >= data.pageCount) {
+      setPage(Math.max(0, data.pageCount - 1))
+    }
+  }, [data, page])
 
   const handleOpenLinkModal = useCallback((tutor: Tutor) => {
     setSelectedTutor(tutor)
@@ -163,66 +169,75 @@ const TutorListPage = () => {
         </div>
       )}
 
-      {/* Empty State */}
-      {!isLoading && !isError && data?.content.length === 0 && (
-        <div className="bg-gray-50 border border-gray-200 rounded-2xl p-12 text-center">
-          <div className="text-6xl mb-4">👤</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {hasActiveFilters ? t('tutors.noTutorsFound') : t('tutors.noTutorsRegistered')}
-          </h3>
-          <p className="text-gray-500 mb-6">
-            {hasActiveFilters
-              ? t('tutors.noFilterResults')
-              : t('tutors.startRegistering')}
-          </p>
-          {hasActiveFilters ? (
-            <button
-              onClick={() => {
-                setSearchTerm('')
-                setPage(0)
-              }}
-              className="inline-flex px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              {t('common.clearFilters')}
-            </button>
-          ) : (
-            <Link
-              to={ROUTES.TUTORES.NEW}
-              className="inline-flex px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              {t('tutors.registerTutor')}
-            </Link>
-          )}
-        </div>
-      )}
+      {/* Empty State - only when truly no tutors (total === 0 or filters with no results) */}
+      {!isLoading &&
+        !isError &&
+        data &&
+        data.content.length === 0 &&
+        (data.total === 0 || hasActiveFilters) && (
+          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-12 text-center">
+            <div className="text-6xl mb-4">👤</div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {hasActiveFilters ? t('tutors.noTutorsFound') : t('tutors.noTutorsRegistered')}
+            </h3>
+            <p className="text-gray-500 mb-6">
+              {hasActiveFilters
+                ? t('tutors.noFilterResults')
+                : t('tutors.startRegistering')}
+            </p>
+            {hasActiveFilters ? (
+              <button
+                onClick={() => {
+                  setSearchTerm('')
+                  setPage(0)
+                }}
+                className="inline-flex px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                {t('common.clearFilters')}
+              </button>
+            ) : (
+              <Link
+                to={ROUTES.TUTORES.NEW}
+                className="inline-flex px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                {t('tutors.registerTutor')}
+              </Link>
+            )}
+          </div>
+        )}
 
       {/* Tutor Grid */}
       {!isLoading && !isError && data && data.content.length > 0 && (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {data.content.map((tutor) => (
-              <TutorListCard
-                key={tutor.id}
-                tutor={tutor}
-                onLinkPet={handleOpenLinkModal}
-                onDelete={handleDeleteClick}
-              />
-            ))}
-          </div>
-
-          {/* Pagination & Results Info */}
-          <div className="mt-8 flex flex-col items-center gap-4">
-            <Pagination
-              currentPage={page + 1}
-              totalPages={data.pageCount}
-              onPageChange={handlePageChange}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {data.content.map((tutor) => (
+            <TutorListCard
+              key={tutor.id}
+              tutor={tutor}
+              onLinkPet={handleOpenLinkModal}
+              onDelete={handleDeleteClick}
             />
+          ))}
+        </div>
+      )}
 
-            <p className="text-sm text-gray-500 bg-gray-100 px-4 py-2 rounded-full">
-              {t('common.showing', { current: data.content.length, total: data.total })} {t('tutors.tutors')}
-            </p>
-          </div>
-        </>
+      {/* Pagination - show when total > pageSize (even if current page content is empty) */}
+      {!isLoading && !isError && data && data.total > PAGE_SIZE && (
+        <PaginationWithInfo
+          currentPage={page + 1}
+          totalPages={data.pageCount}
+          total={data.total}
+          pageSize={PAGE_SIZE}
+          itemCount={data.content.length}
+          itemLabel={t('tutors.tutors')}
+          onPageChange={handlePageChange}
+        />
+      )}
+
+      {/* Info when total <= pageSize but has results */}
+      {!isLoading && !isError && data && data.content.length > 0 && data.total <= PAGE_SIZE && (
+        <p className="text-sm text-gray-500 bg-gray-100 px-4 py-2 rounded-full mt-6 text-center">
+          {t('common.showing', { current: data.content.length, total: data.total })} {t('tutors.tutors')}
+        </p>
       )}
 
       {/* Link Pet Modal */}

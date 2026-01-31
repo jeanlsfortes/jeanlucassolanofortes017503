@@ -10,13 +10,23 @@ import type {
   PetPhotoUpload,
 } from '../types/pet.types'
 
+function normalizeListResponse(raw: unknown): PetListResponse {
+  const r = raw as Record<string, unknown>
+  const total = (r.totalElements ?? r.total ?? 0) as number
+  const size = (r.size ?? 10) as number
+  const pageCount = (r.totalPages ?? r.pageCount ?? Math.max(1, Math.ceil(total / size))) as number
+  const content = (r.content ?? []) as Pet[]
+  const page = (r.number ?? r.page ?? 0) as number
+  return { page, size, total, pageCount, content }
+}
+
 class PetService {
   async list(params?: PetListParams): Promise<PetListResponse> {
-    const response = await apiClient.get<PetListResponse>(
+    const response = await apiClient.get<unknown>(
       API_CONFIG.ENDPOINTS.PETS.BASE,
       { params }
     )
-    return response.data
+    return normalizeListResponse(response.data)
   }
 
   async getById(id: number): Promise<PetDetail> {
@@ -48,16 +58,11 @@ class PetService {
 
   async uploadPhoto(id: number, photo: PetPhotoUpload): Promise<Pet> {
     const formData = new FormData()
-    formData.append('file', photo.file)
+    formData.append('foto', photo.file)
 
     const response = await apiClient.post<Pet>(
       API_CONFIG.ENDPOINTS.PETS.PHOTO(String(id)),
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
+      formData
     )
     return response.data
   }

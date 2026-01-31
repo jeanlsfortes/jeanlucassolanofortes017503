@@ -20,12 +20,12 @@ function validateId(id: number, paramName: string = 'id'): void {
 }
 
 /**
- * Validates pagination parameters
+ * Validates pagination parameters (page is 0-based)
  */
 function validatePaginationParams(params?: TutorListParams): void {
   if (params) {
-    if (params.page !== undefined && (params.page < 1 || !Number.isInteger(params.page))) {
-      throw new Error('Invalid page: must be a positive integer')
+    if (params.page !== undefined && (params.page < 0 || !Number.isInteger(params.page))) {
+      throw new Error('Invalid page: must be a non-negative integer')
     }
     if (params.size !== undefined && (params.size < 1 || !Number.isInteger(params.size))) {
       throw new Error('Invalid size: must be a positive integer')
@@ -53,14 +53,24 @@ function validatePhotoFile(file: File): void {
   }
 }
 
+function normalizeListResponse(raw: unknown): TutorListResponse {
+  const r = raw as Record<string, unknown>
+  const total = (r.totalElements ?? r.total ?? 0) as number
+  const size = (r.size ?? 10) as number
+  const pageCount = (r.totalPages ?? r.pageCount ?? Math.max(1, Math.ceil(total / size))) as number
+  const content = (r.content ?? []) as Tutor[]
+  const page = (r.number ?? r.page ?? 0) as number
+  return { page, size, total, pageCount, content }
+}
+
 class TutorService {
   async list(params?: TutorListParams): Promise<TutorListResponse> {
     validatePaginationParams(params)
-    const response = await apiClient.get<TutorListResponse>(
+    const response = await apiClient.get<unknown>(
       API_CONFIG.ENDPOINTS.TUTORES.BASE,
       { params }
     )
-    return response.data
+    return normalizeListResponse(response.data)
   }
 
   async getById(id: number): Promise<Tutor> {
@@ -98,16 +108,11 @@ class TutorService {
     validatePhotoFile(photo.file)
 
     const formData = new FormData()
-    formData.append('file', photo.file)
+    formData.append('foto', photo.file)
 
     const response = await apiClient.post<Tutor>(
       API_CONFIG.ENDPOINTS.TUTORES.PHOTO(String(id)),
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
+      formData
     )
     return response.data
   }

@@ -27,7 +27,12 @@ export const tutorState$ = new BehaviorSubject<TutorState>(initialState)
 
 export const tutorStateActions = {
   setLoading: (loading: boolean) => {
-    tutorState$.next({ ...tutorState$.getValue(), loading, error: null })
+    const current = tutorState$.getValue()
+    tutorState$.next({
+      ...current,
+      loading,
+      ...(loading ? { error: null } : {}), // Only clear error when starting new operation
+    })
   },
 
   setTutors: (data: TutorListResponse) => {

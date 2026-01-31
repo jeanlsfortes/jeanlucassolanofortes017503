@@ -15,11 +15,15 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const accessToken = useAuthStore.getState().accessToken
-    
+
     if (accessToken && config.headers) {
       config.headers.Authorization = `Bearer ${accessToken}`
     }
-    
+
+    if (config.data instanceof FormData && config.headers) {
+      delete config.headers['Content-Type']
+    }
+
     return config
   },
   (error) => {
@@ -41,22 +45,17 @@ apiClient.interceptors.response.use(
         const refreshToken = useAuthStore.getState().refreshToken
         
         if (refreshToken) {
-          const response = await axios.post(
-            `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.REFRESH}`,
-            { refresh_token: refreshToken }
-          )
+          const { authService } = await import('@/api/services/auth.service')
+          const data = await authService.refreshToken(refreshToken)
 
-          const { access_token, refresh_token, expires_in } = response.data
-          
-          // Update tokens in store
           useAuthStore.getState().login({
-            access_token,
-            refresh_token,
-            expires_in,
+            access_token: data.access_token,
+            refresh_token: data.refresh_token,
+            expires_in: data.expires_in,
           })
 
           if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${access_token}`
+            originalRequest.headers.Authorization = `Bearer ${data.access_token}`
           }
 
           return apiClient(originalRequest)

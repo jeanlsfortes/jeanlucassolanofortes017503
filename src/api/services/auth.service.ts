@@ -1,3 +1,4 @@
+import axios from 'axios'
 import apiClient from '@/@core/interceptors/axios.interceptor'
 import { API_CONFIG } from '@/@core/configs/api.config'
 import type {
@@ -16,12 +17,15 @@ class AuthService {
     return response.data
   }
 
-  async refreshToken(
-    refreshToken: string
-  ): Promise<RefreshTokenResponse> {
-    const response = await apiClient.put<RefreshTokenResponse>(
-      API_CONFIG.ENDPOINTS.AUTH.REFRESH,
-      { refreshToken } as RefreshTokenRequest
+  async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
+    const request: RefreshTokenRequest = { refresh_token: refreshToken }
+    const response = await axios.post<RefreshTokenResponse>(
+      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.REFRESH}`,
+      request,
+      {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: API_CONFIG.TIMEOUT,
+      }
     )
     return response.data
   }

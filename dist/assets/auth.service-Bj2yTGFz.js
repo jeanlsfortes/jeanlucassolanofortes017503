@@ -1,0 +1,2 @@
+import{d as n,A as e,C as o}from"./index-zR4aG_ID.js";class a{async login(s){return(await n.post(e.ENDPOINTS.AUTH.LOGIN,s)).data}async refreshToken(s){const t={refresh_token:s};return(await o.post(`${e.BASE_URL}${e.ENDPOINTS.AUTH.REFRESH}`,t,{headers:{"Content-Type":"application/json"},timeout:e.TIMEOUT})).data}}const c=new a;export{c as authService};
+//# sourceMappingURL=auth.service-Bj2yTGFz.js.map

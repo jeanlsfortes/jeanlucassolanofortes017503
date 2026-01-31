@@ -102,9 +102,10 @@ describe('HealthService', () => {
     })
 
     it('should return partial results when one check fails', async () => {
-      vi.mocked(apiClient.get)
-        .mockResolvedValueOnce({ status: 200 }) // liveness
-        .mockRejectedValueOnce(new Error('Not ready')) // readiness
+      vi.mocked(apiClient.get).mockImplementation((url: string) => {
+        if (url === '/health/ready') return Promise.reject(new Error('Not ready'))
+        return Promise.resolve({ status: 200 })
+      })
 
       const result = await healthService.checkAll()
 
